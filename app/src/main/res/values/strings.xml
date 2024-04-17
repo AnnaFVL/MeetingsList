@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">MyMeetings</string>
+
+    <string name="meetingslist_header">Meetings List</string>
+
+    <string name="meetingdetails_header">Meetings details</string>
+    <string name="meetingdetails_title_lable">Meeting title</string>
+    <string name="meetingdetails_datetime_lable">Meeting date and time</string>
+    <string name="meetingdetails_persosonarea_lable">Person</string>
+    <string name="meetingdetails_selectperson_button">Select a person</string>
+
+    <string name="clientslist_header">Clients List</string>
+
 </resources>

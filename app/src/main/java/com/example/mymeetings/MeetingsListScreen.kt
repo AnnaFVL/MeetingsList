@@ -1,6 +1,7 @@
 package com.example.mymeetings
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,9 +26,10 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 
 @Composable
-fun MeetingsListScreen(onNavigateToDetails: () -> Unit, modifier: Modifier = Modifier) {
+fun MeetingsListScreen(modifier: Modifier = Modifier, onItemClick: (id: Int) -> Unit = {}) {
 
     val meetingsVM: MeetingsViewModel = viewModel()
 
@@ -39,7 +41,7 @@ fun MeetingsListScreen(onNavigateToDetails: () -> Unit, modifier: Modifier = Mod
         horizontalAlignment = Alignment.Start,
     ) {
         Text(
-            text = "Meetings List",
+            text = stringResource(id = R.string.meetingslist_header),
             fontSize=25.sp
         )
         LazyColumn (modifier = modifier
@@ -47,13 +49,13 @@ fun MeetingsListScreen(onNavigateToDetails: () -> Unit, modifier: Modifier = Mod
             .fillMaxWidth()
         ) {
             items(meetingsVM.getMeetings()) { meeting ->
-                MeetingItem(meeting, modifier)
+                MeetingItem(meeting, modifier, onItemClick = { id -> onItemClick(id) })
             }
         }
         FloatingActionButton(modifier = modifier
             .padding(horizontal = 16.dp)
             .align(Alignment.End),
-            onClick = { onNavigateToDetails() }) {
+            onClick = { onItemClick(-1) } ) {
             Icon(Icons.Filled.Add, contentDescription = "Add new meeting")
         }
     }
@@ -61,10 +63,11 @@ fun MeetingsListScreen(onNavigateToDetails: () -> Unit, modifier: Modifier = Mod
 }
 
 @Composable
-fun MeetingItem(item: Meeting, modifier: Modifier) {
+fun MeetingItem(item: Meeting, modifier: Modifier, onItemClick: (id: Int) -> Unit) {
     Card (modifier = modifier
         .padding(vertical = 4.dp)
         .fillMaxWidth()
+        .clickable { onItemClick(item.id) }
     ) {
         Row(modifier = modifier.padding(8.dp)) {
             Box(modifier = modifier

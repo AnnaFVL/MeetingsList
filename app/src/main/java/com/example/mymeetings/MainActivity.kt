@@ -10,9 +10,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.mymeetings.ui.theme.MyMeetingsTheme
 
 class MainActivity : ComponentActivity() {
@@ -37,8 +39,10 @@ fun MeetingsApp(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
 
     NavHost(navController, startDestination = "meetingslist") {
-        composable(route = "meetingslist") { MeetingsListScreen (onNavigateToDetails = { navController.navigate("meetingsdetails") }) }
-        composable(route = "meetingsdetails") { MeetingDetailsScreen(onNavigateToClients = { navController.navigate("clientslist") }) }
+        composable(route = "meetingslist") { MeetingsListScreen (onItemClick = { id -> navController.navigate("meetingsdetails/$id")}) }
+        composable(route = "meetingsdetails/{meeting_id}",
+            arguments = listOf(navArgument("meeting_id") {type = NavType.IntType})
+            ) { MeetingDetailsScreen(onNavigateToClients = { navController.navigate("clientslist") }) }
         composable(route = "clientslist") { ClientsListScreen() }
     }
 
