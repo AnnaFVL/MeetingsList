@@ -8,12 +8,12 @@ import kotlinx.coroutines.flow.StateFlow
 
 data class Meeting (
     val id: Int,
-    val title: String,
-    val date: String,
-    val person: String
+    var title: String,
+    var date: String,
+    var person: String
 )
 
-val dummyMeetings = listOf( Meeting(0, "Title0", "Date0", "Person0"),
+val dummyMeetings = mutableListOf( Meeting(0, "Title0", "Date0", "Person0"),
     Meeting(1, "Title1", "Date1", "Person1"),
     Meeting(2, "Title2", "Date2", "Person2"),
     Meeting(3, "Title3", "Date3", "Person3"),
@@ -26,12 +26,22 @@ class MeetingsViewModel(): ViewModel() {
 
 class MeetingDetailsViewModel(private val stateHandle: SavedStateHandle): ViewModel() {
     val state = mutableStateOf<Meeting?>(null)
-
     init {
         val id = stateHandle.get<Int>("meeting_id")
         if (id == -1 || id == null) state.value = null
         else state.value = dummyMeetings[id]
+    }
+    fun onUpdateMeetingClick (titleNewValue: String, dateNewValue: String) {
+        val id = state.value?.id ?: -1
+        if (id > -1) {
+            dummyMeetings[id].title = titleNewValue
+            dummyMeetings[id].date = dateNewValue
+        }
+    }
 
-        //if (id != null) state.value = dummyMeetings[id] else dummyMeetings[0]
+    fun onAddMeetingClick (titleNewValue: String, dateNewValue: String) {
+        val id: Int = dummyMeetings.size ?: 0
+        val newMeeting = Meeting(id, titleNewValue, dateNewValue, "new person $id")
+        dummyMeetings.add(newMeeting)
     }
 }

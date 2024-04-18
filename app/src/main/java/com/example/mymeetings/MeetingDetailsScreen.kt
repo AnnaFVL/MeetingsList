@@ -14,6 +14,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,52 +25,62 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, modifier: Modifier = Modifier) {
+fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, modifier: Modifier = Modifier) {
 
     val meetingVM: MeetingDetailsViewModel = viewModel()
     val item = meetingVM.state.value
 
-    //val meetingTitle: String = "Title"
-    //val meetingDateTime: String = "Date and Time"
+    val meetingTitleInitVal: String = item?.title ?: ""
+    val meetingDateTimeInitVal: String = item?.date ?: ""
 
-    if (item != null) {
-        Column(
-            modifier = modifier
-                .padding(8.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.Start,
-        ) {
-            Text(
-                text = stringResource(id = R.string.meetingdetails_header),
-                fontSize = 25.sp
+    val meetingTitle = remember { mutableStateOf(meetingTitleInitVal) }
+    val meetingDateTime = remember { mutableStateOf(meetingDateTimeInitVal) }
+
+    Column(
+        modifier = modifier
+            .padding(8.dp)
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.Start,
+    ) {
+        Text(
+            text = if (item != null) stringResource(id = R.string.meetingdetails_header)
+            else stringResource(id = R.string.meetingdetails_newitem_header),
+            fontSize = 25.sp
+        )
+        Column(modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+            TextField(
+                value = meetingTitle.value,
+                onValueChange = { newText -> meetingTitle.value = newText},
+                label = { Text(stringResource(id = R.string.meetingdetails_title_lable)) },
+                singleLine = true,
+                modifier = modifier
+                    .padding(vertical = 4.dp)
+                    .fillMaxWidth()
             )
-            Column(modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                TextField(
-                    value = item.title,
-                    onValueChange = {},
-                    label = { Text(stringResource(id = R.string.meetingdetails_title_lable)) },
-                    singleLine = true,
-                    modifier = modifier
-                        .padding(vertical = 4.dp)
-                        .fillMaxWidth()
-                )
-                TextField(
-                    value = item.date,
-                    onValueChange = {},
-                    label = { Text(stringResource(id = R.string.meetingdetails_datetime_lable)) },
-                    singleLine = true,
-                    modifier = modifier
-                        .padding(vertical = 4.dp)
-                        .fillMaxWidth()
-                )
-
-                PersonCard(onNavigateToClients = onNavigateToClients, modifier = modifier)
-
+            TextField(
+                value = meetingDateTime.value,
+                onValueChange = { newText -> meetingDateTime.value = newText },
+                label = { Text(stringResource(id = R.string.meetingdetails_datetime_lable)) },
+                singleLine = true,
+                modifier = modifier
+                    .padding(vertical = 4.dp)
+                    .fillMaxWidth()
+            )
+            PersonCard(onNavigateToClients = onNavigateToClients, modifier = modifier)
+            Button(modifier = modifier
+                .padding(top = 8.dp)
+                .fillMaxWidth(),
+                onClick = {
+                    if (item != null) meetingVM.onUpdateMeetingClick(meetingTitle.value, meetingDateTime.value)
+                    else meetingVM.onAddMeetingClick(meetingTitle.value, meetingDateTime.value)
+                    onReturn()
+                }) {
+                Text(text = if (item != null) stringResource(id = R.string.meetingdetails_save_button)
+                else stringResource(id = R.string.meetingdetails_add_button))
             }
+
         }
-    } else {
-        Text("Item is null")
     }
 }
 
@@ -97,7 +109,7 @@ fun PersonCard(onNavigateToClients: () -> Unit, modifier: Modifier) {
                     Text(text = personEmail)
                 }
             }
-            Button(modifier = modifier.align(Alignment.CenterHorizontally),
+            Button(modifier = modifier.align(Alignment.CenterHorizontally).padding(bottom = 8.dp),
                 onClick = { onNavigateToClients() }) {
                 Text(stringResource(id = R.string.meetingdetails_selectperson_button))
             }
