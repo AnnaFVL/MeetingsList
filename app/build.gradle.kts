@@ -52,6 +52,8 @@ android {
 dependencies {
     val nav_version = "2.7.7"
     val lifecycle_version = "2.7.0"
+    val retrofit_version = "2.11.0"
+    val gson_version = "2.10.1"
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -78,4 +80,10 @@ dependencies {
     // For ViewModel in Compose
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version")
+
+    // For Rertofit HTTP Client
+    implementation ("com.squareup.retrofit2:retrofit:$retrofit_version")
+    implementation ("com.google.code.gson:gson:$gson_version")
+    implementation ("com.squareup.retrofit2:converter-gson:$retrofit_version")
+
 }
