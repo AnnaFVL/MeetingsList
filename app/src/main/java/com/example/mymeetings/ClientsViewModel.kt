@@ -48,4 +48,8 @@ class ClientsViewModel(): ViewModel() {
             }
     }*/
 
+    fun updateClient(person: Client) {
+        //
+    }
+
 }

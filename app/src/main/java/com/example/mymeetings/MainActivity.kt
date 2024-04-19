@@ -43,7 +43,7 @@ fun MeetingsApp(modifier: Modifier = Modifier) {
         composable(route = "meetingsdetails/{meeting_id}",
             arguments = listOf(navArgument("meeting_id") {type = NavType.IntType})
             ) { MeetingDetailsScreen(onNavigateToClients = { navController.navigate("clientslist") }, onReturn = { navController.popBackStack()}) }
-        composable(route = "clientslist") { ClientsListScreen() }
+        composable(route = "clientslist") { ClientsListScreen(onReturn = { navController.popBackStack()}) }
     }
 
 }

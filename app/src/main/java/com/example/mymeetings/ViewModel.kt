@@ -3,21 +3,20 @@ package com.example.mymeetings
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 data class Meeting (
     val id: Int,
     var title: String,
     var date: String,
-    var person: String
+    var person: Client
 )
 
-val dummyMeetings = mutableListOf( Meeting(0, "Title0", "Date0", "Person0"),
-    Meeting(1, "Title1", "Date1", "Person1"),
-    Meeting(2, "Title2", "Date2", "Person2"),
-    Meeting(3, "Title3", "Date3", "Person3"),
-    Meeting(4, "Title4", "Date4", "Person4"),)
+val dummyClient = Client(Name("First Name", "Last Name"), "email", "photoUrl")
+val dummyMeetings = mutableListOf( Meeting(0, "Title0", "Date0", dummyClient),
+    Meeting(1, "Title1", "Date1", dummyClient),
+    Meeting(2, "Title2", "Date2", dummyClient),
+    Meeting(3, "Title3", "Date3", dummyClient),
+    Meeting(4, "Title4", "Date4", dummyClient),)
 
 class MeetingsViewModel(): ViewModel() {
     fun getMeetings() = dummyMeetings
@@ -41,7 +40,7 @@ class MeetingDetailsViewModel(private val stateHandle: SavedStateHandle): ViewMo
 
     fun onAddMeetingClick (titleNewValue: String, dateNewValue: String) {
         val id: Int = dummyMeetings.size ?: 0
-        val newMeeting = Meeting(id, titleNewValue, dateNewValue, "new person $id")
+        val newMeeting = Meeting(id, titleNewValue, dateNewValue, Client(Name("New first", "New last"), "New email", "New url"))
         dummyMeetings.add(newMeeting)
     }
 }

@@ -35,6 +35,7 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
 
     val meetingTitle = remember { mutableStateOf(meetingTitleInitVal) }
     val meetingDateTime = remember { mutableStateOf(meetingDateTimeInitVal) }
+    val person = item?.person ?: Client(Name("Null name", "Null last name"), "Null email", "Null url")
 
     Column(
         modifier = modifier
@@ -67,7 +68,7 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
                     .padding(vertical = 4.dp)
                     .fillMaxWidth()
             )
-            PersonCard(onNavigateToClients = onNavigateToClients, modifier = modifier)
+            PersonCard(client = person, onNavigateToClients = onNavigateToClients, modifier = modifier)
             Button(modifier = modifier
                 .padding(top = 8.dp)
                 .fillMaxWidth(),
@@ -85,9 +86,9 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
 }
 
 @Composable
-fun PersonCard(onNavigateToClients: () -> Unit, modifier: Modifier) {
-    val personName: String = "Person name"
-    val personEmail: String = "Person email"
+fun PersonCard(client: Client, onNavigateToClients: () -> Unit, modifier: Modifier) {
+    val personName: String = client.name.first + " " + client.name.last
+    val personEmail: String = client.email
 
     Card (modifier = modifier
         .padding(vertical = 4.dp)

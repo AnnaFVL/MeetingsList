@@ -1,6 +1,7 @@
 package com.example.mymeetings
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun ClientsListScreen(modifier: Modifier = Modifier) {
+fun ClientsListScreen(onReturn: () -> Unit, modifier: Modifier = Modifier) {
 
     val viewModel: ClientsViewModel = viewModel()
     viewModel.getClients()
@@ -44,18 +45,22 @@ fun ClientsListScreen(modifier: Modifier = Modifier) {
             .padding(horizontal = 16.dp)
             .fillMaxWidth()
         ) {
-            items(viewModel.state.value) { meeting ->
-                ClientItem(meeting, modifier)
+            items(viewModel.state.value) { client ->
+                ClientItem(client, modifier, onItemClick = {
+                    viewModel.updateClient(client)
+                    onReturn()
+                })
             }
         }
     }
 }
 
 @Composable
-fun ClientItem(item: Client, modifier: Modifier = Modifier){
+fun ClientItem(item: Client, modifier: Modifier = Modifier, onItemClick: (selected: Client) -> Unit){
     Card (modifier = modifier
         .padding(vertical = 4.dp)
         .fillMaxWidth()
+        .clickable { onItemClick(item) }
     ) {
         Row(modifier = modifier.padding(8.dp)) {
             Box(
