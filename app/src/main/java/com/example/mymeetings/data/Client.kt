@@ -1,4 +1,4 @@
-package com.example.mymeetings
+package com.example.mymeetings.data
 
 import com.google.gson.annotations.SerializedName
 data class Client (

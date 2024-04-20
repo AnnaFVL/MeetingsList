@@ -1,4 +1,4 @@
-package com.example.mymeetings
+package com.example.mymeetings.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +23,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.mymeetings.data.Client
+import com.example.mymeetings.viewmodels.MeetingDetailsViewModel
+import com.example.mymeetings.data.Name
+import com.example.mymeetings.R
 
 @Composable
 fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, modifier: Modifier = Modifier) {

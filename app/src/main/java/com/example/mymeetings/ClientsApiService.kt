@@ -1,5 +1,6 @@
 package com.example.mymeetings
 
+import com.example.mymeetings.data.ApiResponse
 import retrofit2.Call
 import retrofit2.http.GET
 interface ClientsApiService {

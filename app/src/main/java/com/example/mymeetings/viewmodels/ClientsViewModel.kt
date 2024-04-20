@@ -1,7 +1,10 @@
-package com.example.mymeetings
+package com.example.mymeetings.viewmodels
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.example.mymeetings.data.ApiResponse
+import com.example.mymeetings.data.Client
+import com.example.mymeetings.ClientsApiService
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

@@ -1,4 +1,4 @@
-package com.example.mymeetings
+package com.example.mymeetings.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,6 +26,9 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import com.example.mymeetings.data.Meeting
+import com.example.mymeetings.viewmodels.MeetingsViewModel
+import com.example.mymeetings.R
 
 @Composable
 fun MeetingsListScreen(modifier: Modifier = Modifier, onItemClick: (id: Int) -> Unit = {}) {
