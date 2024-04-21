@@ -1,8 +1,7 @@
 package com.example.mymeetings.screens
 
+import android.app.TimePickerDialog
 import android.icu.util.Calendar
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,7 +19,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -39,7 +40,6 @@ import com.example.mymeetings.R
 import com.example.mymeetings.data.Manager
 import java.text.SimpleDateFormat
 
-@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, modifier: Modifier = Modifier) {
@@ -50,12 +50,18 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
 
     val meetingTitle by meetingVM.title.collectAsState()
     val meetingDate by meetingVM.date.collectAsState()
+    val meetingTime = remember { mutableStateOf("Meeting Time") }
 
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = System.currentTimeMillis(),
         yearRange = IntRange(2024, 2026)
     )
     val showDatePicker = remember { mutableStateOf(false) }
+
+    val timePickerState = rememberTimePickerState(
+        is24Hour = true
+    )
+    val showTimePicker = remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -82,7 +88,7 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
             TextField(
                 value = meetingDate,
                 onValueChange = { newText -> meetingVM.updateDate(newText)},
-                label = { Text(stringResource(id = R.string.meetingdetails_datetime_lable)) },
+                label = { Text(stringResource(id = R.string.meetingdetails_date_lable)) },
                 singleLine = true,
                 modifier = modifier
                     .padding(vertical = 4.dp)
@@ -93,6 +99,21 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(text = "Select a date")
+            }
+            TextField(
+                value = meetingTime.value,
+                onValueChange = { newText -> meetingTime.value = newText },
+                label = { Text(stringResource(id = R.string.meetingdetails_time_lable)) },
+                singleLine = true,
+                modifier = modifier
+                    .padding(vertical = 4.dp)
+                    .fillMaxWidth()
+            )
+            Button(
+                onClick = { showTimePicker.value = true },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(text = "Select a time")
             }
             PersonCard(personInit = personInit, onNavigateToClients = onNavigateToClients, modifier = modifier)
             Button(modifier = modifier
@@ -134,6 +155,28 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
         )
         {
             DatePicker(state = datePickerState)
+        }
+    }
+
+    // Display time picker component
+    if (showTimePicker.value) {
+        TimePickerDialog(
+            onDismissRequest = { showTimePicker.value = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val selectedTimeValue: String = "${timePickerState.hour}:${timePickerState.minute}"
+                        meetingTime.value = selectedTimeValue
+                        showTimePicker.value = false
+                    }
+            ) { Text("OK") } },
+            dismissButton = {
+                TextButton(
+                    onClick = { showTimePicker.value = false }
+            ) { Text("Cancel") } }
+        )
+        {
+            TimePicker(state = timePickerState)
         }
     }
 }

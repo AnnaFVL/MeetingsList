@@ -6,7 +6,8 @@
     <string name="meetingdetails_header">Meeting details</string>
     <string name="meetingdetails_newitem_header">Add new meeting</string>
     <string name="meetingdetails_title_lable">Meeting title</string>
-    <string name="meetingdetails_datetime_lable">Meeting date and time</string>
+    <string name="meetingdetails_date_lable">Meeting date</string>
+    <string name="meetingdetails_time_lable">Meeting time</string>
     <string name="meetingdetails_persosonarea_lable">Person</string>
     <string name="meetingdetails_selectperson_button">Select a person</string>
     <string name="meetingdetails_save_button">Save changes</string>
