@@ -10,19 +10,17 @@ import com.example.mymeetings.data.Name
 import com.example.mymeetings.data.Meeting
 import com.example.mymeetings.data.dummyMeetings
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class MeetingDetailsViewModel(private val stateHandle: SavedStateHandle): ViewModel() {
     val state = mutableStateOf<Meeting?>(null)
     val personAreaInfo = mutableStateOf<Client>(Manager.emptyClient)
 
-    private var titleInit : String = ""
-    private var dateInit : String = ""
+    private val _title = MutableStateFlow("")
+    val title: StateFlow<String> = _title
 
-    //val meetingTitleInitVal: String = item?.title ?: ""
-    //val meetingDateTimeInitVal: String = item?.date ?: ""
-
-    val title = MutableStateFlow(titleInit) //mutableStateOf<String>(titleInit)
-    val date = MutableStateFlow(dateInit)// mutableStateOf<String>(dateInit)
+    private val _date = MutableStateFlow("")
+    val date: StateFlow<String> = _date
 
     init {
         val id = stateHandle.get<Int>("meeting_id")
@@ -31,24 +29,29 @@ class MeetingDetailsViewModel(private val stateHandle: SavedStateHandle): ViewMo
             state.value = Manager.getMeetingById(id)
             personAreaInfo.value = state.value?.person ?: Manager.emptyClient
 
-            titleInit  = state.value?.title ?: ""
-            dateInit = state.value?.date ?: ""
+            val titleInit  = state.value?.title ?: ""
+            val dateInit = state.value?.date ?: ""
 
-            title.value = titleInit
-            date.value = dateInit
+            _title.value = titleInit
+            _date.value = dateInit
         }
-        //if (Manager.selectedClient.value!= null) personAreaInfo.value = Manager.selectedClient.value!!
     }
     fun onUpdateMeetingClick (titleNewValue: String, dateNewValue: String) {
         val id = state.value?.id ?: -1
         if (id > -1) {
             Manager.updateMeeting(id, titleNewValue, dateNewValue)
         }
-        Manager.selectedClient.value = null
     }
 
     fun onAddMeetingClick (titleNewValue: String, dateNewValue: String) {
         Manager.addNewMeeting(titleNewValue, dateNewValue)
-        Manager.selectedClient.value = null
+    }
+
+    fun updateTitle(newValue: String) {
+        _title.value = newValue
+    }
+
+    fun updateDate(newValue: String) {
+        _date.value = newValue
     }
 }

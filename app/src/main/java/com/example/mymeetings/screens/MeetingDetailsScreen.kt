@@ -16,8 +16,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,7 +25,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mymeetings.data.Client
 import com.example.mymeetings.viewmodels.MeetingDetailsViewModel
-import com.example.mymeetings.data.Name
 import com.example.mymeetings.R
 import com.example.mymeetings.data.Manager
 
@@ -38,14 +35,8 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
     val item = meetingVM.state.value
     val personInit = meetingVM.personAreaInfo.value
 
-    //val meetingTitleInitVal: String = item?.title ?: ""
-    //val meetingDateTimeInitVal: String = item?.date ?: ""
-
     val meetingTitle by meetingVM.title.collectAsState()
     val meetingDateTime by meetingVM.date.collectAsState()
-
-    //val meetingTitle = remember { mutableStateOf(meetingTitleInitVal) }
-    //val meetingDateTime = remember { mutableStateOf(meetingDateTimeInitVal) }
 
     Column(
         modifier = modifier
@@ -62,7 +53,7 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
         Column(modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
             TextField(
                 value = meetingTitle,
-                onValueChange = { newText -> meetingVM.title.value = newText },//meetingTitle.value = newText},
+                onValueChange = { newText -> meetingVM.updateTitle(newText)},
                 label = { Text(stringResource(id = R.string.meetingdetails_title_lable)) },
                 singleLine = true,
                 modifier = modifier
@@ -71,7 +62,7 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
             )
             TextField(
                 value = meetingDateTime,
-                onValueChange = { newText -> meetingVM.date.value = newText }, // meetingDateTime.value = newText },
+                onValueChange = { newText -> meetingVM.updateDate(newText)},
                 label = { Text(stringResource(id = R.string.meetingdetails_datetime_lable)) },
                 singleLine = true,
                 modifier = modifier

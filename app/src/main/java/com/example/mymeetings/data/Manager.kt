@@ -30,6 +30,7 @@ object Manager {
         val client: Client = selectedClient.value ?: emptyClient
         val newMeeting = Meeting(id, title, date, client)
         meetings.add(newMeeting)
+        selectedClient.value = null
     }
 
     fun updateMeeting(id: Int, title: String, date: String) {
@@ -38,6 +39,6 @@ object Manager {
             meetings[id].date = date
             if (selectedClient.value != null) meetings[id].person = selectedClient.value!!
         }
-
+       selectedClient.value = null
     }
 }
