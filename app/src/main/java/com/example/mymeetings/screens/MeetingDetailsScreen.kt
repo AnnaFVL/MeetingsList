@@ -14,6 +14,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -27,19 +29,23 @@ import com.example.mymeetings.data.Client
 import com.example.mymeetings.viewmodels.MeetingDetailsViewModel
 import com.example.mymeetings.data.Name
 import com.example.mymeetings.R
+import com.example.mymeetings.data.Manager
 
 @Composable
 fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, modifier: Modifier = Modifier) {
 
     val meetingVM: MeetingDetailsViewModel = viewModel()
     val item = meetingVM.state.value
+    val personInit = meetingVM.personAreaInfo.value
 
-    val meetingTitleInitVal: String = item?.title ?: ""
-    val meetingDateTimeInitVal: String = item?.date ?: ""
+    //val meetingTitleInitVal: String = item?.title ?: ""
+    //val meetingDateTimeInitVal: String = item?.date ?: ""
 
-    val meetingTitle = remember { mutableStateOf(meetingTitleInitVal) }
-    val meetingDateTime = remember { mutableStateOf(meetingDateTimeInitVal) }
-    val person = item?.person ?: Client(Name("Null name", "Null last name"), "Null email", "Null url")
+    val meetingTitle by meetingVM.title.collectAsState()
+    val meetingDateTime by meetingVM.date.collectAsState()
+
+    //val meetingTitle = remember { mutableStateOf(meetingTitleInitVal) }
+    //val meetingDateTime = remember { mutableStateOf(meetingDateTimeInitVal) }
 
     Column(
         modifier = modifier
@@ -55,8 +61,8 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
         )
         Column(modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
             TextField(
-                value = meetingTitle.value,
-                onValueChange = { newText -> meetingTitle.value = newText},
+                value = meetingTitle,
+                onValueChange = { newText -> meetingVM.title.value = newText },//meetingTitle.value = newText},
                 label = { Text(stringResource(id = R.string.meetingdetails_title_lable)) },
                 singleLine = true,
                 modifier = modifier
@@ -64,21 +70,21 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
                     .fillMaxWidth()
             )
             TextField(
-                value = meetingDateTime.value,
-                onValueChange = { newText -> meetingDateTime.value = newText },
+                value = meetingDateTime,
+                onValueChange = { newText -> meetingVM.date.value = newText }, // meetingDateTime.value = newText },
                 label = { Text(stringResource(id = R.string.meetingdetails_datetime_lable)) },
                 singleLine = true,
                 modifier = modifier
                     .padding(vertical = 4.dp)
                     .fillMaxWidth()
             )
-            PersonCard(client = person, onNavigateToClients = onNavigateToClients, modifier = modifier)
+            PersonCard(personInit = personInit, onNavigateToClients = onNavigateToClients, modifier = modifier)
             Button(modifier = modifier
                 .padding(top = 8.dp)
                 .fillMaxWidth(),
                 onClick = {
-                    if (item != null) meetingVM.onUpdateMeetingClick(meetingTitle.value, meetingDateTime.value)
-                    else meetingVM.onAddMeetingClick(meetingTitle.value, meetingDateTime.value)
+                    if (item != null) meetingVM.onUpdateMeetingClick(meetingTitle, meetingDateTime)
+                    else meetingVM.onAddMeetingClick(meetingTitle, meetingDateTime)
                     onReturn()
                 }) {
                 Text(text = if (item != null) stringResource(id = R.string.meetingdetails_save_button)
@@ -90,9 +96,13 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
 }
 
 @Composable
-fun PersonCard(client: Client, onNavigateToClients: () -> Unit, modifier: Modifier) {
-    val personName: String = client.name.first + " " + client.name.last
-    val personEmail: String = client.email
+fun PersonCard(personInit: Client, onNavigateToClients: () -> Unit, modifier: Modifier) {
+
+    val personSelected = Manager.selectedClient.value
+    val person: Client = personSelected ?: personInit
+
+    val personName: String = person.name.first + " " + person.name.last
+    val personEmail: String = person.email
 
     Card (modifier = modifier
         .padding(vertical = 4.dp)
@@ -114,7 +124,9 @@ fun PersonCard(client: Client, onNavigateToClients: () -> Unit, modifier: Modifi
                     Text(text = personEmail)
                 }
             }
-            Button(modifier = modifier.align(Alignment.CenterHorizontally).padding(bottom = 8.dp),
+            Button(modifier = modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(bottom = 8.dp),
                 onClick = { onNavigateToClients() }) {
                 Text(stringResource(id = R.string.meetingdetails_selectperson_button))
             }

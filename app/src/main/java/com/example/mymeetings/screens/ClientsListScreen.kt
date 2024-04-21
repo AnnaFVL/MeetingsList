@@ -49,7 +49,7 @@ fun ClientsListScreen(onReturn: () -> Unit, modifier: Modifier = Modifier) {
         ) {
             items(viewModel.state.value) { client ->
                 ClientItem(client, modifier, onItemClick = {
-                    viewModel.updateClient(client)
+                    viewModel.selectClient(client)
                     onReturn()
                 })
             }

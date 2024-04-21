@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.example.mymeetings.data.ApiResponse
 import com.example.mymeetings.data.Client
 import com.example.mymeetings.ClientsApiService
+import com.example.mymeetings.data.Manager
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -16,6 +17,8 @@ class ClientsViewModel(): ViewModel() {
     val state = mutableStateOf(emptyList<Client>())
 
     init {
+        Manager.selectedClient.value = null
+
         val retrofit: Retrofit = Retrofit.Builder().addConverterFactory(GsonConverterFactory.create())
             .baseUrl("https://randomuser.me/").build()
         restInterface = retrofit.create(ClientsApiService::class.java)
@@ -51,8 +54,8 @@ class ClientsViewModel(): ViewModel() {
             }
     }*/
 
-    fun updateClient(person: Client) {
-        //
+    fun selectClient(person: Client) {
+        Manager.selectedClient.value = person
     }
 
 }
