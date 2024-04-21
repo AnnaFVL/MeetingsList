@@ -1,5 +1,8 @@
 package com.example.mymeetings.screens
 
+import android.icu.util.Calendar
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,11 +14,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,7 +37,10 @@ import com.example.mymeetings.data.Client
 import com.example.mymeetings.viewmodels.MeetingDetailsViewModel
 import com.example.mymeetings.R
 import com.example.mymeetings.data.Manager
+import java.text.SimpleDateFormat
 
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, modifier: Modifier = Modifier) {
 
@@ -36,7 +49,13 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
     val personInit = meetingVM.personAreaInfo.value
 
     val meetingTitle by meetingVM.title.collectAsState()
-    val meetingDateTime by meetingVM.date.collectAsState()
+    val meetingDate by meetingVM.date.collectAsState()
+
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = System.currentTimeMillis(),
+        yearRange = IntRange(2024, 2026)
+    )
+    val showDatePicker = remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -61,7 +80,7 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
                     .fillMaxWidth()
             )
             TextField(
-                value = meetingDateTime,
+                value = meetingDate,
                 onValueChange = { newText -> meetingVM.updateDate(newText)},
                 label = { Text(stringResource(id = R.string.meetingdetails_datetime_lable)) },
                 singleLine = true,
@@ -69,19 +88,52 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
                     .padding(vertical = 4.dp)
                     .fillMaxWidth()
             )
+            Button(
+                onClick = { showDatePicker.value = true },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(text = "Select a date")
+            }
             PersonCard(personInit = personInit, onNavigateToClients = onNavigateToClients, modifier = modifier)
             Button(modifier = modifier
                 .padding(top = 8.dp)
                 .fillMaxWidth(),
                 onClick = {
-                    if (item != null) meetingVM.onUpdateMeetingClick(meetingTitle, meetingDateTime)
-                    else meetingVM.onAddMeetingClick(meetingTitle, meetingDateTime)
+                    if (item != null) meetingVM.onUpdateMeetingClick(meetingTitle, meetingDate)
+                    else meetingVM.onAddMeetingClick(meetingTitle, meetingDate)
                     onReturn()
                 }) {
                 Text(text = if (item != null) stringResource(id = R.string.meetingdetails_save_button)
                 else stringResource(id = R.string.meetingdetails_add_button))
             }
 
+        }
+    }
+
+    // Display date picker component
+    if (showDatePicker.value) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker.value = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val selectedDate = Calendar.getInstance().apply {
+                            timeInMillis = datePickerState.selectedDateMillis!!
+                        }
+                        val simpleDateFormat = SimpleDateFormat("dd.MM.yyyy")
+                        val dateText = simpleDateFormat.format(selectedDate.time).toString()
+                        meetingVM.updateDate(dateText)
+
+                        showDatePicker.value = false
+                    }
+            ) { Text("OK") } },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDatePicker.value = false }
+            ) { Text("Cancel") } }
+        )
+        {
+            DatePicker(state = datePickerState)
         }
     }
 }

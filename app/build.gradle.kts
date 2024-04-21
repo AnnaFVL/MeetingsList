@@ -54,6 +54,7 @@ dependencies {
     val lifecycle_version = "2.7.0"
     val retrofit_version = "2.11.0"
     val gson_version = "2.10.1"
+    val material3_version = "1.2.1"
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -86,4 +87,6 @@ dependencies {
     implementation ("com.google.code.gson:gson:$gson_version")
     implementation ("com.squareup.retrofit2:converter-gson:$retrofit_version")
 
+    // For date and time picker
+    implementation("androidx.compose.material3:material3:$material3_version")
 }

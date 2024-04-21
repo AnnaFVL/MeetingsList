@@ -48,3 +48,4 @@ fun MeetingsApp(modifier: Modifier = Modifier) {
     }
 
 }
+
