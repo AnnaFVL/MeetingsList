@@ -50,15 +50,21 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
 
     val meetingTitle by meetingVM.title.collectAsState()
     val meetingDate by meetingVM.date.collectAsState()
-    val meetingTime = remember { mutableStateOf("Meeting Time") }
+    val meetingTime by meetingVM.time.collectAsState()
+    //val meetingTime = remember { mutableStateOf("Meeting Time") }
+
+    val selectedDateTimeMsInit : Long = (item?.dateTimeMs) ?: System.currentTimeMillis()
+    val selectedDateTimeMs = remember { mutableStateOf(selectedDateTimeMsInit) }
 
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = System.currentTimeMillis(),
+        initialSelectedDateMillis = selectedDateTimeMs.value,
         yearRange = IntRange(2024, 2026)
     )
     val showDatePicker = remember { mutableStateOf(false) }
 
     val timePickerState = rememberTimePickerState(
+        initialHour = meetingVM.selectedDate.get(Calendar.HOUR_OF_DAY),
+        initialMinute = meetingVM.selectedDate.get(Calendar.MINUTE),
         is24Hour = true
     )
     val showTimePicker = remember { mutableStateOf(false) }
@@ -85,43 +91,47 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
                     .padding(vertical = 4.dp)
                     .fillMaxWidth()
             )
-            TextField(
-                value = meetingDate,
-                onValueChange = { newText -> meetingVM.updateDate(newText)},
-                label = { Text(stringResource(id = R.string.meetingdetails_date_lable)) },
-                singleLine = true,
-                modifier = modifier
-                    .padding(vertical = 4.dp)
-                    .fillMaxWidth()
-            )
-            Button(
-                onClick = { showDatePicker.value = true },
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(text = "Select a date")
+            Row(modifier = modifier.padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                TextField(
+                    value = meetingDate,
+                    onValueChange = { },
+                    label = { Text(stringResource(id = R.string.meetingdetails_date_lable)) },
+                    singleLine = true,
+                    modifier = modifier.weight(1f)
+                )
+                Button(
+                    onClick = { showDatePicker.value = true },
+                    modifier = modifier
+                        .weight(1f)
+                        .padding(start = 8.dp)
+                ) {
+                    Text(text = "Select a date")
+                }
             }
-            TextField(
-                value = meetingTime.value,
-                onValueChange = { newText -> meetingTime.value = newText },
-                label = { Text(stringResource(id = R.string.meetingdetails_time_lable)) },
-                singleLine = true,
-                modifier = modifier
-                    .padding(vertical = 4.dp)
-                    .fillMaxWidth()
-            )
-            Button(
-                onClick = { showTimePicker.value = true },
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(text = "Select a time")
+            Row(modifier = modifier.padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                TextField(
+                    value = meetingTime,
+                    onValueChange = { },
+                    label = { Text(stringResource(id = R.string.meetingdetails_time_lable)) },
+                    singleLine = true,
+                    modifier = modifier.weight(1f)
+                )
+                Button(
+                    onClick = { showTimePicker.value = true },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 8.dp)
+                ) {
+                    Text(text = "Select a time")
+                }
             }
             PersonCard(personInit = personInit, onNavigateToClients = onNavigateToClients, modifier = modifier)
             Button(modifier = modifier
                 .padding(top = 8.dp)
                 .fillMaxWidth(),
                 onClick = {
-                    if (item != null) meetingVM.onUpdateMeetingClick(meetingTitle, meetingDate)
-                    else meetingVM.onAddMeetingClick(meetingTitle, meetingDate)
+                    if (item != null) meetingVM.onUpdateMeetingClick(meetingTitle, selectedDateTimeMs.value)
+                    else meetingVM.onAddMeetingClick(meetingTitle, selectedDateTimeMs.value)
                     onReturn()
                 }) {
                 Text(text = if (item != null) stringResource(id = R.string.meetingdetails_save_button)
@@ -141,6 +151,26 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
                         val selectedDate = Calendar.getInstance().apply {
                             timeInMillis = datePickerState.selectedDateMillis!!
                         }
+
+                        val selectedDateTimeCalendar = Calendar.getInstance().apply {
+                            timeInMillis = datePickerState.selectedDateMillis!!
+                        }
+                        selectedDateTimeCalendar.add(Calendar.HOUR_OF_DAY, timePickerState.hour)
+                        selectedDateTimeCalendar.add(Calendar.MINUTE, timePickerState.minute)
+                        selectedDateTimeMs.value = selectedDateTimeCalendar.timeInMillis
+                        //
+                        //selectedDate.add(Calendar.HOUR_OF_DAY, timePickerState.hour)
+                        //selectedDate.add(Calendar.MINUTE, timePickerState.minute)
+                        //val long = selectedDate.timeInMillis;
+
+                        /*val selectedDate2 = Calendar.getInstance().apply {
+                            timeInMillis = long
+                        }
+
+                        selectedDate2.get(Calendar.HOUR_OF_DAY);
+                        selectedDate2.get(Calendar.MINUTE);*/
+                        //
+
                         val simpleDateFormat = SimpleDateFormat("dd.MM.yyyy")
                         val dateText = simpleDateFormat.format(selectedDate.time).toString()
                         meetingVM.updateDate(dateText)
@@ -165,8 +195,16 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
             confirmButton = {
                 TextButton(
                     onClick = {
+                        val selectedDateTimeCalendar = Calendar.getInstance().apply {
+                            timeInMillis = datePickerState.selectedDateMillis!!
+                        }
+                        selectedDateTimeCalendar.add(Calendar.HOUR_OF_DAY, timePickerState.hour)
+                        selectedDateTimeCalendar.add(Calendar.MINUTE, timePickerState.minute)
+                        selectedDateTimeMs.value = selectedDateTimeCalendar.timeInMillis
+
                         val selectedTimeValue: String = "${timePickerState.hour}:${timePickerState.minute}"
-                        meetingTime.value = selectedTimeValue
+                        meetingVM.updateTime(selectedTimeValue)
+                        //meetingTime.value = selectedTimeValue
                         showTimePicker.value = false
                     }
             ) { Text("OK") } },

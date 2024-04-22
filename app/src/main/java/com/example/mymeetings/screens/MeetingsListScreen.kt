@@ -78,7 +78,7 @@ fun MeetingItem(item: Meeting, modifier: Modifier, onItemClick: (id: Int) -> Uni
             )
             Column (modifier = modifier.padding(start = 8.dp)) {
                 Text(item.title)
-                Text(item.date)
+                Text(item.dateTimeMs.toString())
                 Text("${item.person.name.first} ${item.person.name.last}")
             }
         }
