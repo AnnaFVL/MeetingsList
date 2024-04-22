@@ -34,6 +34,7 @@ import com.example.mymeetings.R
 fun MeetingsListScreen(modifier: Modifier = Modifier, onItemClick: (id: Int) -> Unit = {}) {
 
     val meetingsVM: MeetingsViewModel = viewModel()
+    var dateTimeString : String = ""
 
     Column(
         modifier = modifier
@@ -51,7 +52,8 @@ fun MeetingsListScreen(modifier: Modifier = Modifier, onItemClick: (id: Int) -> 
             .fillMaxWidth()
         ) {
             items(meetingsVM.getMeetings()) { meeting ->
-                MeetingItem(meeting, modifier, onItemClick = { id -> onItemClick(id) })
+                dateTimeString = meetingsVM.getDateTimeString(meeting.dateTimeMs)
+                MeetingItem(meeting, dateTimeString, modifier, onItemClick = { id -> onItemClick(id) })
             }
         }
         FloatingActionButton(modifier = modifier
@@ -65,7 +67,7 @@ fun MeetingsListScreen(modifier: Modifier = Modifier, onItemClick: (id: Int) -> 
 }
 
 @Composable
-fun MeetingItem(item: Meeting, modifier: Modifier, onItemClick: (id: Int) -> Unit) {
+fun MeetingItem(item: Meeting, dateTimeString: String, modifier: Modifier, onItemClick: (id: Int) -> Unit) {
     Card (modifier = modifier
         .padding(vertical = 4.dp)
         .fillMaxWidth()
@@ -78,10 +80,10 @@ fun MeetingItem(item: Meeting, modifier: Modifier, onItemClick: (id: Int) -> Uni
             )
             Column (modifier = modifier.padding(start = 8.dp)) {
                 Text(item.title)
-                Text(item.dateTimeMs.toString())
+                Text(dateTimeString)
+                //Text(item.dateTimeMs.toString())
                 Text("${item.person.name.first} ${item.person.name.last}")
             }
         }
-
     }
 }
