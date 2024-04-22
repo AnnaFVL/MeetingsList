@@ -6,8 +6,13 @@ data class Client (
     val name: Name,
     @SerializedName("email")
     val email: String,
-    @SerializedName("picture.medium")
-    val photoUrl: String
+    @SerializedName("picture")
+    val photoUrl: Photo
+)
+
+data class Photo (
+    @SerializedName("medium")
+    val medium: String
 )
 
 data class Name (

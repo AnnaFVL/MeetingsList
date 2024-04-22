@@ -1,5 +1,6 @@
 package com.example.mymeetings.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,10 +19,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.example.mymeetings.data.Client
 import com.example.mymeetings.viewmodels.ClientsViewModel
 import com.example.mymeetings.R
@@ -69,7 +74,16 @@ fun ClientItem(item: Client, modifier: Modifier = Modifier, onItemClick: (select
                 modifier = modifier
                     .size(60.dp)
                     .background(Color.Green)
-            )
+            ) {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(item.photoUrl.medium)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = null,
+                    modifier = Modifier.size(60.dp)
+                )
+            }
             Column(modifier = modifier.padding(start = 8.dp)) {
                 Text(text = "${item.name.first} ${item.name.last}")
                 Text(text = item.email)

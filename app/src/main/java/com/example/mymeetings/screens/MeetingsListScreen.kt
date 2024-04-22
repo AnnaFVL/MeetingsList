@@ -1,5 +1,6 @@
 package com.example.mymeetings.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,7 +26,11 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.mymeetings.data.Meeting
 import com.example.mymeetings.viewmodels.MeetingsViewModel
 import com.example.mymeetings.R
@@ -77,11 +82,27 @@ fun MeetingItem(item: Meeting, dateTimeString: String, modifier: Modifier, onIte
             Box(modifier = modifier
                 .size(60.dp)
                 .background(Color.Green)
-            )
+            ) {
+                if (item.person.photoUrl.medium == "") {
+                    Image(painter = painterResource(R.drawable.baseline_person_24),
+                        contentDescription = null,
+                        modifier = Modifier.size(60.dp)
+                    )
+                }
+                else {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(item.person.photoUrl.medium)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = null,
+                        modifier = Modifier.size(60.dp)
+                    )
+                }
+            }
             Column (modifier = modifier.padding(start = 8.dp)) {
                 Text(item.title)
                 Text(dateTimeString)
-                //Text(item.dateTimeMs.toString())
                 Text("${item.person.name.first} ${item.person.name.last}")
             }
         }

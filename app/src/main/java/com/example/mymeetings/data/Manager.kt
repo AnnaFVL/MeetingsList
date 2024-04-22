@@ -3,7 +3,7 @@ package com.example.mymeetings.data
 import androidx.compose.runtime.mutableStateOf
 import java.time.LocalDateTime
 
-val dummyClient = Client(Name("First Name", "Last Name"), "email", "photoUrl")
+val dummyClient = Client(Name("First Name", "Last Name"), "email", Photo(""))
 val dummyDateTimeMs : Long = System.currentTimeMillis()
 val dummyMeetings = mutableListOf( Meeting(0, "Title0", dummyDateTimeMs, dummyClient),
     Meeting(1, "Title1", dummyDateTimeMs, dummyClient),
@@ -14,7 +14,7 @@ val dummyMeetings = mutableListOf( Meeting(0, "Title0", dummyDateTimeMs, dummyCl
 object Manager {
     private val meetings = dummyMeetings
     var selectedClient = mutableStateOf<Client?>(null)
-    val emptyClient: Client = Client(Name("Empty ", "name"), "Empty email", "Empty url")
+    val emptyClient: Client = Client(Name("Empty ", "name"), "Empty email", Photo(""))
     fun getMeetings() : List<Meeting> {
         return meetings
     }

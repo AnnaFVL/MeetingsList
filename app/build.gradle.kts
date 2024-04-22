@@ -55,6 +55,7 @@ dependencies {
     val retrofit_version = "2.11.0"
     val gson_version = "2.10.1"
     val material3_version = "1.2.1"
+    val coil_version = "2.6.0"
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -89,4 +90,7 @@ dependencies {
 
     // For date and time picker
     implementation("androidx.compose.material3:material3:$material3_version")
+
+    // For image load and display
+    implementation("io.coil-kt:coil-compose:$coil_version")
 }

@@ -2,6 +2,7 @@ package com.example.mymeetings.screens
 
 import android.app.TimePickerDialog
 import android.icu.util.Calendar
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,10 +31,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.example.mymeetings.data.Client
 import com.example.mymeetings.viewmodels.MeetingDetailsViewModel
 import com.example.mymeetings.R
@@ -242,7 +248,24 @@ fun PersonCard(personInit: Client, onNavigateToClients: () -> Unit, modifier: Mo
                     modifier = modifier
                         .size(60.dp)
                         .background(Color.Green)
-                )
+                ) {
+                    if (person.photoUrl.medium == "") {
+                        Image(painter = painterResource(R.drawable.baseline_person_24),
+                            contentDescription = null,
+                            modifier = Modifier.size(60.dp)
+                            )
+                    }
+                    else {
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(person.photoUrl.medium)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = null,
+                            modifier = Modifier.size(60.dp)
+                        )
+                    }
+                }
                 Column(modifier = modifier.padding(start = 8.dp)) {
                     Text(text = personName)
                     Text(text = personEmail)
