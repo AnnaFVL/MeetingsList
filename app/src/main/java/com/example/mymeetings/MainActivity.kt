@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.mymeetings.dal.AppDatabase
 import com.example.mymeetings.screens.ClientsListScreen
 import com.example.mymeetings.screens.MeetingDetailsScreen
 import com.example.mymeetings.screens.MeetingsListScreen
@@ -21,6 +22,8 @@ import com.example.mymeetings.ui.theme.MyMeetingsTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //AppDatabase.invoke(applicationContext)
+        //Manager.initDB(applicationContext)
         setContent {
             MyMeetingsTheme {
                 // A surface container using the 'background' color from the theme
@@ -37,6 +40,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MeetingsApp(modifier: Modifier = Modifier) {
+
     val navController = rememberNavController()
 
     NavHost(navController, startDestination = "meetingslist") {

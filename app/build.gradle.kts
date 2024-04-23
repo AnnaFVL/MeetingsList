@@ -1,6 +1,9 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+
+    id("com.google.devtools.ksp")
+
 }
 
 android {
@@ -56,6 +59,8 @@ dependencies {
     val gson_version = "2.10.1"
     val material3_version = "1.2.1"
     val coil_version = "2.6.0"
+    val room_version = "2.6.1"
+    val coroutines_version = "1.7.3"
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -93,4 +98,13 @@ dependencies {
 
     // For image load and display
     implementation("io.coil-kt:coil-compose:$coil_version")
+
+    // For ROOM
+    implementation("androidx.room:room-runtime:$room_version")
+    annotationProcessor("androidx.room:room-compiler:$room_version")
+    ksp("androidx.room:room-compiler:$room_version")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version")
+    implementation("androidx.room:room-ktx:$room_version")
+
 }

@@ -1,7 +1,14 @@
 package com.example.mymeetings.data
 
 import androidx.compose.runtime.mutableStateOf
-import java.time.LocalDateTime
+import com.example.mymeetings.MeetingApplication
+import com.example.mymeetings.dal.AppDatabase
+import com.example.mymeetings.dal.MeetingRecord
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
 
 val dummyClient = Client(Name("First Name", "Last Name"), "email", Photo(""))
 val dummyDateTimeMs : Long = System.currentTimeMillis()
@@ -12,11 +19,89 @@ val dummyMeetings = mutableListOf( Meeting(0, "Title0", dummyDateTimeMs, dummyCl
     Meeting(4, "Title4", dummyDateTimeMs, dummyClient),)
 
 object Manager {
-    private val meetings = dummyMeetings
+    private val meetings : MutableList<Meeting> = mutableListOf<Meeting>() //= dummyMeetings
     var selectedClient = mutableStateOf<Client?>(null)
     val emptyClient: Client = Client(Name("Empty ", "name"), "Empty email", Photo(""))
+
+    private var meetingDAO = AppDatabase.getDaoInstance(MeetingApplication.getAppContext())
+
+    //private lateinit var db : AppDatabase
+    //private lateinit var meetingDAO: MeetingDAO
+
+    /*fun initDB(applicationContext: Context) {
+        db = Room.databaseBuilder(
+            applicationContext,
+            AppDatabase::class.java, "meeting-db"
+        ).build()
+        meetingDAO = db.meetingDao()
+    }*/
+
+    suspend fun getMeetingsFromDB(): List<MeetingRecord> {
+        return withContext(Dispatchers.IO) {
+            val meetings = meetingDAO.getAll()
+            return@withContext meetings
+        }
+    }
+
+    fun initMeetings() {
+
+        GlobalScope.launch() {
+            val meetingsFromDB: List<MeetingRecord> = getMeetingsFromDB() //meetingDAO.getAll()
+            meetingsFromDB.forEach{ itemFromDB ->
+                meetings.add(convertToMeeting(itemFromDB))
+            }
+        }
+/*        GlobalScope.launch {
+            withContext(Dispatchers.Main) {
+                context?.let {
+                    if (AppDatabase.get().meetingDao().getAll().isNotEmpty()) {
+
+                        Appatabase(it).TaskDao().getAllTask()
+
+                    }
+                }
+
+            }
+
+        }*/
+/*
+        val meetingsFromDB: List<MeetingRecord> = getMeetingsFromDB() //meetingDAO.getAll()
+        meetingsFromDB.forEach{ itemFromDB ->
+            meetings.add(convertToMeeting(itemFromDB))
+        }
+
+        return meetings*/
+   }
+
     fun getMeetings() : List<Meeting> {
         return meetings
+    }
+
+    private fun convertToMeeting(itemFromDB: MeetingRecord): Meeting {
+        val newMeeting : Meeting = Meeting(
+            id = itemFromDB.id,
+            title = itemFromDB.title,
+            dateTimeMs = itemFromDB.dateTime,
+            person = Client(
+                name = Name(itemFromDB.personFirstName,itemFromDB.personLastName),
+                email = itemFromDB.personEmail,
+                photoUrl = Photo(medium = itemFromDB.personPhoto)
+            )
+        )
+        return newMeeting
+    }
+
+    private fun convertToMeetingRecord(item: Meeting): MeetingRecord {
+        val newMeetingRecord : MeetingRecord = MeetingRecord(
+            id =  item.id,
+            title = item.title,
+            dateTime = item.dateTimeMs,
+            personFirstName = item.person.name.first,
+            personLastName = item.person.name.last,
+            personEmail = item.person.email,
+            personPhoto = item.person.photoUrl.medium,
+        )
+        return newMeetingRecord
     }
 
     fun getMeetingById(id: Int) : Meeting? {
@@ -33,6 +118,20 @@ object Manager {
         val newMeeting = Meeting(id, title, dateTimeMs, client)
         meetings.add(newMeeting)
         selectedClient.value = null
+
+        val newMeetingRecord:MeetingRecord = convertToMeetingRecord(newMeeting)
+        GlobalScope.launch() {
+            addMeetingsToDB(newMeetingRecord)
+            }
+
+
+        //meetingDAO.addMeeting(newMeetingRecord)
+    }
+
+    suspend fun addMeetingsToDB(item: MeetingRecord) {
+        withContext(Dispatchers.IO) {
+            meetingDAO.addMeeting(item)
+        }
     }
 
     fun updateMeeting(id: Int, title: String, dateTimeMs: Long) {

@@ -9,6 +9,11 @@ import com.example.mymeetings.data.dummyMeetings
 import java.text.SimpleDateFormat
 
 class MeetingsViewModel(): ViewModel() {
+
+    init {
+        Manager.initMeetings()
+    }
+
     fun getMeetings() : List<Meeting> {
         Manager.selectedClient.value = null
         return Manager.getMeetings()
