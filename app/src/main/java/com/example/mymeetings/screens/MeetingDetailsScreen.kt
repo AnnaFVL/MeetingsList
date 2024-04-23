@@ -42,6 +42,7 @@ import com.example.mymeetings.data.Client
 import com.example.mymeetings.viewmodels.MeetingDetailsViewModel
 import com.example.mymeetings.R
 import com.example.mymeetings.data.Manager
+import com.example.mymeetings.data.PresentOrFutureSelectableDates
 import java.text.SimpleDateFormat
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,7 +62,8 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
 
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = selectedDateTimeMs.value,
-        yearRange = IntRange(2024, 2026)
+        //yearRange = IntRange(2024, 2026),
+        selectableDates = PresentOrFutureSelectableDates
     )
     val showDatePicker = remember { mutableStateOf(false) }
 
