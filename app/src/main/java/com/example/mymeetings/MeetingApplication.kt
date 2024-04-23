@@ -7,7 +7,6 @@ class MeetingApplication: Application() {
     init { app = this }
     companion object {
         private lateinit var app: MeetingApplication
-        fun getAppContext(): Context =
-            app.applicationContext
+        fun getAppContext(): Context = app.applicationContext
     }
 }

@@ -62,7 +62,6 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
 
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = selectedDateTimeMs.value,
-        //yearRange = IntRange(2024, 2026),
         selectableDates = PresentOrFutureSelectableDates
     )
     val showDatePicker = remember { mutableStateOf(false) }

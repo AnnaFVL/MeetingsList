@@ -12,7 +12,7 @@ object PresentOrFutureSelectableDates: SelectableDates {
             ZoneId.systemDefault()
         )
             .toInstant()
-            .toEpochMilli() //System.currentTimeMillis()
+            .toEpochMilli()
     }
 
     override fun isSelectableYear(year: Int): Boolean {

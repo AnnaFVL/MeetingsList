@@ -46,14 +46,6 @@ class ClientsViewModel(): ViewModel() {
             })
     }
 
-   /*
-
-        restInterface.getClients().execute().body()
-            ?.let { clients ->
-                state.value = clients
-            }
-    }*/
-
     fun selectClient(person: Client) {
         Manager.selectedClient.value = person
     }

@@ -2,15 +2,12 @@ package com.example.mymeetings.viewmodels
 
 import android.icu.util.Calendar
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.example.mymeetings.data.Client
 import com.example.mymeetings.data.Manager
-import com.example.mymeetings.data.Name
 import com.example.mymeetings.data.Meeting
 import com.example.mymeetings.data.dummyDateTimeMs
-import com.example.mymeetings.data.dummyMeetings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.text.SimpleDateFormat

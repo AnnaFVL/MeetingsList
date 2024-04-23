@@ -68,7 +68,6 @@ fun MeetingsListScreen(modifier: Modifier = Modifier, onItemClick: (id: Int) -> 
             Icon(Icons.Filled.Add, contentDescription = "Add new meeting")
         }
     }
-
 }
 
 @Composable

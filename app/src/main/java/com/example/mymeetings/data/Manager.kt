@@ -10,13 +10,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-val dummyClient = Client(Name("First Name", "Last Name"), "email", Photo(""))
+//val dummyClient = Client(Name("First Name", "Last Name"), "email", Photo(""))
 val dummyDateTimeMs : Long = System.currentTimeMillis()
-val dummyMeetings = mutableListOf( Meeting(0, "Title0", dummyDateTimeMs, dummyClient),
+/*val dummyMeetings = mutableListOf( Meeting(0, "Title0", dummyDateTimeMs, dummyClient),
     Meeting(1, "Title1", dummyDateTimeMs, dummyClient),
     Meeting(2, "Title2", dummyDateTimeMs, dummyClient),
     Meeting(3, "Title3", dummyDateTimeMs, dummyClient),
-    Meeting(4, "Title4", dummyDateTimeMs, dummyClient),)
+    Meeting(4, "Title4", dummyDateTimeMs, dummyClient),)*/
 
 object Manager {
     private val meetings : MutableList<Meeting> = mutableListOf<Meeting>() //= dummyMeetings
@@ -24,17 +24,6 @@ object Manager {
     val emptyClient: Client = Client(Name("Empty ", "name"), "Empty email", Photo(""))
 
     private var meetingDAO = AppDatabase.getDaoInstance(MeetingApplication.getAppContext())
-
-    //private lateinit var db : AppDatabase
-    //private lateinit var meetingDAO: MeetingDAO
-
-    /*fun initDB(applicationContext: Context) {
-        db = Room.databaseBuilder(
-            applicationContext,
-            AppDatabase::class.java, "meeting-db"
-        ).build()
-        meetingDAO = db.meetingDao()
-    }*/
 
     suspend fun getMeetingsFromDB(): List<MeetingRecord> {
         return withContext(Dispatchers.IO) {
@@ -51,26 +40,6 @@ object Manager {
                 meetings.add(convertToMeeting(itemFromDB))
             }
         }
-/*        GlobalScope.launch {
-            withContext(Dispatchers.Main) {
-                context?.let {
-                    if (AppDatabase.get().meetingDao().getAll().isNotEmpty()) {
-
-                        Appatabase(it).TaskDao().getAllTask()
-
-                    }
-                }
-
-            }
-
-        }*/
-/*
-        val meetingsFromDB: List<MeetingRecord> = getMeetingsFromDB() //meetingDAO.getAll()
-        meetingsFromDB.forEach{ itemFromDB ->
-            meetings.add(convertToMeeting(itemFromDB))
-        }
-
-        return meetings*/
    }
 
     fun getMeetings() : List<Meeting> {
@@ -105,27 +74,24 @@ object Manager {
     }
 
     fun getMeetingById(id: Int) : Meeting? {
-        if (id > -1 && id < meetings.size) {
-            return meetings[id]
+        if (id < 0) return null
+        else {
+            meetings.forEach { if (it.id == id) return it }
         }
-        else
-            return null
+        return null
     }
 
     fun addNewMeeting(title: String, dateTimeMs: Long) {
-        val id: Int = meetings.size
+        val id: Int = 0 //meetings.size
         val client: Client = selectedClient.value ?: emptyClient
         val newMeeting = Meeting(id, title, dateTimeMs, client)
         meetings.add(newMeeting)
         selectedClient.value = null
 
         val newMeetingRecord:MeetingRecord = convertToMeetingRecord(newMeeting)
-        GlobalScope.launch() {
+        GlobalScope.launch {
             addMeetingsToDB(newMeetingRecord)
             }
-
-
-        //meetingDAO.addMeeting(newMeetingRecord)
     }
 
     suspend fun addMeetingsToDB(item: MeetingRecord) {
@@ -135,11 +101,28 @@ object Manager {
     }
 
     fun updateMeeting(id: Int, title: String, dateTimeMs: Long) {
-        if (id > -1 && id < meetings.size) {
+        val clientFromMeeting: Client = getMeetingById(id)?.person ?: emptyClient
+        val client: Client = selectedClient.value ?: clientFromMeeting
+        val updateMeetingRecord:MeetingRecord = MeetingRecord(
+            id,
+            title,
+            dateTimeMs,
+            client.name.first,
+            client.name.last,
+            client.email,
+            client.photoUrl.medium)
+
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                meetingDAO.updateMeeting(updateMeetingRecord)
+            }
+        }
+
+ /*       if (id > -1) {
             meetings[id].title = title
             meetings[id].dateTimeMs = dateTimeMs
             if (selectedClient.value != null) meetings[id].person = selectedClient.value!!
-        }
+        }*/
        selectedClient.value = null
     }
 }
