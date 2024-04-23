@@ -1,6 +1,5 @@
 package com.example.mymeetings.screens
 
-import android.app.TimePickerDialog
 import android.icu.util.Calendar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -38,7 +37,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.mymeetings.data.Client
 import com.example.mymeetings.viewmodels.MeetingDetailsViewModel
@@ -57,7 +55,6 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
     val meetingTitle by meetingVM.title.collectAsState()
     val meetingDate by meetingVM.date.collectAsState()
     val meetingTime by meetingVM.time.collectAsState()
-    //val meetingTime = remember { mutableStateOf("Meeting Time") }
 
     val selectedDateTimeMsInit : Long = (item?.dateTimeMs) ?: System.currentTimeMillis()
     val selectedDateTimeMs = remember { mutableStateOf(selectedDateTimeMsInit) }
@@ -135,6 +132,7 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
             Button(modifier = modifier
                 .padding(top = 8.dp)
                 .fillMaxWidth(),
+                enabled = meetingVM.isButtonEnabled(),
                 onClick = {
                     if (item != null) meetingVM.onUpdateMeetingClick(meetingTitle, selectedDateTimeMs.value)
                     else meetingVM.onAddMeetingClick(meetingTitle, selectedDateTimeMs.value)
@@ -143,7 +141,14 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
                 Text(text = if (item != null) stringResource(id = R.string.meetingdetails_save_button)
                 else stringResource(id = R.string.meetingdetails_add_button))
             }
-
+            Button(modifier = modifier
+                .padding(top = 8.dp)
+                .fillMaxWidth(),
+                onClick = {
+                    onReturn()
+                }) {
+                Text(stringResource(id = R.string.meetingdetails_cancel_button))
+            }
         }
     }
 
@@ -164,18 +169,6 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
                         selectedDateTimeCalendar.add(Calendar.HOUR_OF_DAY, timePickerState.hour)
                         selectedDateTimeCalendar.add(Calendar.MINUTE, timePickerState.minute)
                         selectedDateTimeMs.value = selectedDateTimeCalendar.timeInMillis
-                        //
-                        //selectedDate.add(Calendar.HOUR_OF_DAY, timePickerState.hour)
-                        //selectedDate.add(Calendar.MINUTE, timePickerState.minute)
-                        //val long = selectedDate.timeInMillis;
-
-                        /*val selectedDate2 = Calendar.getInstance().apply {
-                            timeInMillis = long
-                        }
-
-                        selectedDate2.get(Calendar.HOUR_OF_DAY);
-                        selectedDate2.get(Calendar.MINUTE);*/
-                        //
 
                         val simpleDateFormat = SimpleDateFormat("dd.MM.yyyy")
                         val dateText = simpleDateFormat.format(selectedDate.time).toString()
@@ -210,7 +203,7 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
 
                         val selectedTimeValue: String = "${timePickerState.hour}:${timePickerState.minute}"
                         meetingVM.updateTime(selectedTimeValue)
-                        //meetingTime.value = selectedTimeValue
+
                         showTimePicker.value = false
                     }
             ) { Text("OK") } },

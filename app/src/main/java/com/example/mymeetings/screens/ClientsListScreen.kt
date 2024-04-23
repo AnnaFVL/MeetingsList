@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,6 +53,7 @@ fun ClientsListScreen(onReturn: () -> Unit, modifier: Modifier = Modifier) {
         LazyColumn(modifier = modifier
             .padding(horizontal = 16.dp)
             .fillMaxWidth()
+            .height(650.dp)
         ) {
             items(viewModel.state.value) { client ->
                 ClientItem(client, modifier, onItemClick = {
@@ -58,6 +61,14 @@ fun ClientsListScreen(onReturn: () -> Unit, modifier: Modifier = Modifier) {
                     onReturn()
                 })
             }
+        }
+        Button(modifier = modifier
+            .padding(top = 8.dp)
+            .fillMaxWidth(),
+            onClick = {
+                onReturn()
+            }) {
+            Text(stringResource(id = R.string.clientslist_back_button))
         }
     }
 }

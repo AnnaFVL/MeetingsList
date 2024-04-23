@@ -59,6 +59,15 @@ class MeetingDetailsViewModel(private val stateHandle: SavedStateHandle): ViewMo
         Manager.addNewMeeting(titleNewValue, dateTimeMsNewValue)
     }
 
+    // Is Add/Save button enabled?
+    fun isButtonEnabled() : Boolean {
+        val isTitlePresent = (_title.value != "")
+        val isDatePresent = (_date.value != "")
+        val isTimePresent = (_time.value != "")
+        val isPersonPresent = (Manager.selectedClient.value != null || state.value != null)
+        return isTitlePresent && isDatePresent && isTimePresent && isPersonPresent
+    }
+
     fun updateTitle(newValue: String) {
         _title.value = newValue
     }
