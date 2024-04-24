@@ -1,5 +1,6 @@
 package com.example.mymeetings.viewmodels
 
+import android.annotation.SuppressLint
 import android.icu.util.Calendar
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.text.SimpleDateFormat
 
+@SuppressLint("SimpleDateFormat")
 class MeetingDetailsViewModel(private val stateHandle: SavedStateHandle): ViewModel() {
     val state = mutableStateOf<Meeting?>(null)
     val personAreaInfo = mutableStateOf<Client>(Manager.emptyClient)

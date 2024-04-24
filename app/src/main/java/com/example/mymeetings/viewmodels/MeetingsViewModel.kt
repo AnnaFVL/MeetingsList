@@ -1,5 +1,6 @@
 package com.example.mymeetings.viewmodels
 
+import android.annotation.SuppressLint
 import android.icu.util.Calendar
 import androidx.lifecycle.ViewModel
 import com.example.mymeetings.data.Manager
@@ -7,16 +8,12 @@ import com.example.mymeetings.data.Meeting
 import java.text.SimpleDateFormat
 
 class MeetingsViewModel(): ViewModel() {
-
-    init {
-        Manager.initMeetings()
-    }
-
     fun getMeetings() : List<Meeting> {
         Manager.selectedClient.value = null
         return Manager.getMeetings()
     }
 
+    @SuppressLint("SimpleDateFormat")
     fun getDateTimeString(dateTimeMs: Long): String {
         val dateTimeCalendar = Calendar.getInstance().apply {
             timeInMillis = dateTimeMs

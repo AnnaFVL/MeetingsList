@@ -1,5 +1,6 @@
 package com.example.mymeetings.screens
 
+import android.annotation.SuppressLint
 import android.icu.util.Calendar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -25,6 +26,7 @@ import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -45,6 +47,7 @@ import com.example.mymeetings.data.Manager
 import com.example.mymeetings.data.PresentOrFutureSelectableDates
 import java.text.SimpleDateFormat
 
+@SuppressLint("SimpleDateFormat")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, modifier: Modifier = Modifier) {
@@ -58,7 +61,7 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
     val meetingTime by meetingVM.time.collectAsState()
 
     val selectedDateTimeMsInit : Long = (item?.dateTimeMs) ?: System.currentTimeMillis()
-    val selectedDateTimeMs = remember { mutableStateOf(selectedDateTimeMsInit) }
+    val selectedDateTimeMs = remember { mutableLongStateOf(selectedDateTimeMsInit) }
 
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = selectedDateTimeMs.value,

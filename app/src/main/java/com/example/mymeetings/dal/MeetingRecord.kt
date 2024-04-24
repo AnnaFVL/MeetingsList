@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "meetings")
 data class MeetingRecord(
-    @PrimaryKey
+    @PrimaryKey (autoGenerate = true)
     val id: Int,
     @ColumnInfo(name="title")
     val title: String,

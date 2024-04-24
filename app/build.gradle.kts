@@ -80,31 +80,46 @@ dependencies {
 
 
     // For navigation in Compose
+    //noinspection UseTomlInstead
     implementation("androidx.navigation:navigation-fragment-ktx:$nav_version")
+    //noinspection UseTomlInstead
     implementation("androidx.navigation:navigation-ui-ktx:$nav_version")
+    //noinspection UseTomlInstead
     implementation("androidx.navigation:navigation-compose:$nav_version")
 
     // For ViewModel in Compose
+    //noinspection UseTomlInstead
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
+    //noinspection UseTomlInstead
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version")
 
     // For Rertofit HTTP Client
+    //noinspection UseTomlInstead
     implementation ("com.squareup.retrofit2:retrofit:$retrofit_version")
+    //noinspection UseTomlInstead
     implementation ("com.google.code.gson:gson:$gson_version")
+    //noinspection UseTomlInstead
     implementation ("com.squareup.retrofit2:converter-gson:$retrofit_version")
 
     // For date and time picker
+    //noinspection UseTomlInstead
     implementation("androidx.compose.material3:material3:$material3_version")
 
     // For image load and display
+    //noinspection UseTomlInstead
     implementation("io.coil-kt:coil-compose:$coil_version")
 
     // For ROOM
+    //noinspection UseTomlInstead
     implementation("androidx.room:room-runtime:$room_version")
+    //noinspection UseTomlInstead
     annotationProcessor("androidx.room:room-compiler:$room_version")
+    //noinspection UseTomlInstead
     ksp("androidx.room:room-compiler:$room_version")
 
+    //noinspection UseTomlInstead
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version")
+    //noinspection UseTomlInstead
     implementation("androidx.room:room-ktx:$room_version")
 
 }
