@@ -2,7 +2,9 @@ package com.example.mymeetings.viewmodels
 
 import android.annotation.SuppressLint
 import android.icu.util.Calendar
+import android.icu.util.TimeZone
 import androidx.lifecycle.ViewModel
+import com.example.mymeetings.MeetingApplication
 import com.example.mymeetings.data.Manager
 import com.example.mymeetings.data.Meeting
 import java.text.SimpleDateFormat
@@ -15,7 +17,7 @@ class MeetingsViewModel(): ViewModel() {
 
     @SuppressLint("SimpleDateFormat")
     fun getDateTimeString(dateTimeMs: Long): String {
-        val dateTimeCalendar = Calendar.getInstance().apply {
+        val dateTimeCalendar = Calendar.getInstance(TimeZone.getDefault()).apply {
             timeInMillis = dateTimeMs
         }
         val simpleDateFormat = SimpleDateFormat("dd.MM.yyyy")

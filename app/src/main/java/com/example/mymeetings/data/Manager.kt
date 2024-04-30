@@ -1,40 +1,62 @@
 package com.example.mymeetings.data
 
+import android.annotation.SuppressLint
+import android.icu.util.Calendar
+import android.icu.util.TimeZone
+import android.os.SystemClock
 import androidx.compose.runtime.mutableStateOf
 import com.example.mymeetings.MeetingApplication
 import com.example.mymeetings.dal.AppDatabase
 import com.example.mymeetings.dal.MeetingRecord
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
-
-//val dummyClient = Client(Name("First Name", "Last Name"), "email", Photo(""))
-val dummyDateTimeMs: Long = System.currentTimeMillis()
-/*val dummyMeetings = mutableListOf( Meeting(0, "Title0", dummyDateTimeMs, dummyClient),
-    Meeting(1, "Title1", dummyDateTimeMs, dummyClient),
-    Meeting(2, "Title2", dummyDateTimeMs, dummyClient),
-    Meeting(3, "Title3", dummyDateTimeMs, dummyClient),
-    Meeting(4, "Title4", dummyDateTimeMs, dummyClient),)*/
-
 object Manager {
-    //private val meetings: MutableList<Meeting> = mutableListOf<Meeting>() //= dummyMeetings
     var selectedClient = mutableStateOf<Client?>(null)
     val emptyClient: Client = Client(Name("Empty ", "name"), "Empty email", Photo(""))
+
+    //var selectedDateTimeMs = mutableStateOf<Long>(System.currentTimeMillis())
 
     private var meetingDAO = AppDatabase.getDaoInstance(MeetingApplication.getAppContext())
 
     fun getMeetings(): List<Meeting> {
-        return runBlocking<List<Meeting>>(Dispatchers.IO){
+        return runBlocking(Dispatchers.IO){
             val meetingsFromDB = meetingDAO.getAll();
             val mappedMeetings = meetingsFromDB.map { i -> convertToMeeting(i) }
             return@runBlocking mappedMeetings
         }
+    }
+
+    fun getInOneHourMeetingsText(): String {
+        return runBlocking(Dispatchers.IO) {
+            val inOneHourMeetings = mutableListOf<Meeting>()
+            val oneHourInFuture = System.currentTimeMillis() + 3600000
+            val allMeetings = getMeetings()
+            // Choose meetings in one hour in future
+            allMeetings.forEach {
+                if (it.dateTimeMs > System.currentTimeMillis() && it.dateTimeMs <= oneHourInFuture) inOneHourMeetings.add(it)
+            }
+            // Construct string for notification
+            var notificationText: String = ""
+            inOneHourMeetings.forEach{
+                notificationText += it.person.name.first + " " + it.person.name.last + " at " + getTimeString(it.dateTimeMs) + "\n"
+            }
+            return@runBlocking notificationText
+        }
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    fun getTimeString(dateTimeMs: Long): String {
+        val dateTimeCalendar = Calendar.getInstance(TimeZone.getDefault()).apply {
+            timeInMillis = dateTimeMs
+        }
+        val hourString = dateTimeCalendar.get(Calendar.HOUR_OF_DAY).toString()
+        val minuteString = dateTimeCalendar.get(Calendar.MINUTE).toString()
+
+        return "$hourString:$minuteString"
     }
 
     private fun convertToMeeting(itemFromDB: MeetingRecord): Meeting {

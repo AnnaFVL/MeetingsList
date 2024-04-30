@@ -2,13 +2,13 @@ package com.example.mymeetings.viewmodels
 
 import android.annotation.SuppressLint
 import android.icu.util.Calendar
+import android.icu.util.TimeZone
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.example.mymeetings.data.Client
 import com.example.mymeetings.data.Manager
 import com.example.mymeetings.data.Meeting
-import com.example.mymeetings.data.dummyDateTimeMs
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.text.SimpleDateFormat
@@ -17,7 +17,7 @@ import java.text.SimpleDateFormat
 class MeetingDetailsViewModel(private val stateHandle: SavedStateHandle): ViewModel() {
     val state = mutableStateOf<Meeting?>(null)
     val personAreaInfo = mutableStateOf<Client>(Manager.emptyClient)
-    var selectedDate: Calendar = Calendar.getInstance().apply { timeInMillis = dummyDateTimeMs }
+    var selectedDate: Calendar = Calendar.getInstance(TimeZone.getDefault()).apply { timeInMillis = System.currentTimeMillis() }
 
     private val _title = MutableStateFlow("")
     val title: StateFlow<String> = _title
@@ -36,7 +36,7 @@ class MeetingDetailsViewModel(private val stateHandle: SavedStateHandle): ViewMo
             personAreaInfo.value = state.value?.person ?: Manager.emptyClient
 
             val titleInit  = state.value?.title ?: ""
-            selectedDate = Calendar.getInstance().apply { timeInMillis = state.value!!.dateTimeMs }
+            selectedDate = Calendar.getInstance(TimeZone.getDefault()).apply { timeInMillis = state.value!!.dateTimeMs }
 
             _title.value = titleInit
 

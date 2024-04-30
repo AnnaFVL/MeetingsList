@@ -2,11 +2,30 @@ package com.example.mymeetings
 
 import android.app.Application
 import android.content.Context
+import androidx.work.PeriodicWorkRequest
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.example.mymeetings.workers.ReminderWorker
+import java.time.Duration
 
 class MeetingApplication: Application() {
-    init { app = this }
+
+    private lateinit var workManager: WorkManager
+
+
+    init {
+        app = this
+    }
     companion object {
         private lateinit var app: MeetingApplication
         fun getAppContext(): Context = app.applicationContext
+    }
+
+    fun enqueueReminderRequest() {
+        workManager = WorkManager.getInstance(applicationContext)
+
+        // Actually worker ignore duration <15 min, so it works every 15min
+        val requestBuilder = PeriodicWorkRequestBuilder<ReminderWorker>(Duration.ofSeconds(10))
+        workManager.enqueue(requestBuilder.build())
     }
 }

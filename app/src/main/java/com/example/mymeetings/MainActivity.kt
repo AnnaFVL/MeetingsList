@@ -21,6 +21,11 @@ import com.example.mymeetings.ui.theme.MyMeetingsTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Check for meetings that should be reminded of
+        val app = this.application as MeetingApplication
+        app.enqueueReminderRequest()
+
         setContent {
             MyMeetingsTheme {
                 // A surface container using the 'background' color from the theme

@@ -2,6 +2,7 @@ package com.example.mymeetings.screens
 
 import android.annotation.SuppressLint
 import android.icu.util.Calendar
+import android.icu.util.TimeZone
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -163,20 +164,23 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
             confirmButton = {
                 TextButton(
                     onClick = {
-                        val selectedDate = Calendar.getInstance().apply {
+                        // Get selected date (from picker) and convert it to formatted string (to display in Text field)
+                        val selectedDate = Calendar.getInstance(TimeZone.getDefault()).apply {
                             timeInMillis = datePickerState.selectedDateMillis!!
                         }
-
-                        val selectedDateTimeCalendar = Calendar.getInstance().apply {
-                            timeInMillis = datePickerState.selectedDateMillis!!
-                        }
-                        selectedDateTimeCalendar.add(Calendar.HOUR_OF_DAY, timePickerState.hour)
-                        selectedDateTimeCalendar.add(Calendar.MINUTE, timePickerState.minute)
-                        selectedDateTimeMs.value = selectedDateTimeCalendar.timeInMillis
-
                         val simpleDateFormat = SimpleDateFormat("dd.MM.yyyy")
                         val dateText = simpleDateFormat.format(selectedDate.time).toString()
                         meetingVM.updateDate(dateText)
+
+                        // Get selected date (from date picker), add selected time (from time picker) and save as selectedDateTime in Screen
+                        val selectedDateTimeCalendar = Calendar.getInstance(TimeZone.getDefault()).apply {
+                            timeInMillis = datePickerState.selectedDateMillis!!
+                        }
+                        selectedDateTimeCalendar.add(Calendar.HOUR_OF_DAY, timePickerState.hour)
+                        selectedDateTimeCalendar.add(Calendar.HOUR_OF_DAY, -10)
+                        selectedDateTimeCalendar.add(Calendar.MINUTE, timePickerState.minute)
+                        selectedDateTimeMs.value = selectedDateTimeCalendar.timeInMillis
+
 
                         showDatePicker.value = false
                     }
@@ -198,13 +202,16 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
             confirmButton = {
                 TextButton(
                     onClick = {
-                        val selectedDateTimeCalendar = Calendar.getInstance().apply {
+                        // Get selected date (from date picker), add selected time (from time picker) and save as selectedDateTime in Screen // TimeZone.getDefault()
+                        val selectedDateTimeCalendar = Calendar.getInstance(TimeZone.getDefault()).apply {
                             timeInMillis = datePickerState.selectedDateMillis!!
                         }
                         selectedDateTimeCalendar.add(Calendar.HOUR_OF_DAY, timePickerState.hour)
+                        selectedDateTimeCalendar.add(Calendar.HOUR_OF_DAY, -10)
                         selectedDateTimeCalendar.add(Calendar.MINUTE, timePickerState.minute)
                         selectedDateTimeMs.value = selectedDateTimeCalendar.timeInMillis
 
+                        // Get selected time (from picker) and convert it to formatted string (to display in Text field)
                         val selectedTimeValue: String = "${timePickerState.hour}:${timePickerState.minute}"
                         meetingVM.updateTime(selectedTimeValue)
 

@@ -61,6 +61,7 @@ dependencies {
     val coil_version = "2.6.0"
     val room_version = "2.6.1"
     val coroutines_version = "1.7.3"
+    val work_version = "2.9.0"
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -116,10 +117,12 @@ dependencies {
     annotationProcessor("androidx.room:room-compiler:$room_version")
     //noinspection UseTomlInstead
     ksp("androidx.room:room-compiler:$room_version")
-
     //noinspection UseTomlInstead
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version")
     //noinspection UseTomlInstead
     implementation("androidx.room:room-ktx:$room_version")
 
+    // For WorkManager
+    implementation("androidx.work:work-runtime-ktx:2.8.1") //$work_version")
+    
 }
