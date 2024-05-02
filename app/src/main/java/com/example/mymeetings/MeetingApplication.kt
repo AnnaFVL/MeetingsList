@@ -24,8 +24,8 @@ class MeetingApplication: Application() {
     fun enqueueReminderRequest() {
         workManager = WorkManager.getInstance(applicationContext)
 
-        // Actually worker ignore duration <15 min, so it works every 15min
-        val requestBuilder = PeriodicWorkRequestBuilder<ReminderWorker>(Duration.ofSeconds(10))
+        // Actually worker ignore duration <15 min
+        val requestBuilder = PeriodicWorkRequestBuilder<ReminderWorker>(Duration.ofMinutes(15))
         workManager.enqueue(requestBuilder.build())
     }
 }
