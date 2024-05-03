@@ -2,7 +2,6 @@ package com.example.mymeetings
 
 import android.app.Application
 import android.content.Context
-import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.mymeetings.workers.ReminderWorker
@@ -12,7 +11,6 @@ class MeetingApplication: Application() {
 
     private lateinit var workManager: WorkManager
 
-
     init {
         app = this
     }
@@ -21,6 +19,7 @@ class MeetingApplication: Application() {
         fun getAppContext(): Context = app.applicationContext
     }
 
+    // Schedule periodic (1 time / 15 min) worker to remind about meetings that are planned in next 1 hour
     fun enqueueReminderRequest() {
         workManager = WorkManager.getInstance(applicationContext)
 

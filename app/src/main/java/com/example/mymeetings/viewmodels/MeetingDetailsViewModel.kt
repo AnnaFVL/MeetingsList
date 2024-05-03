@@ -3,52 +3,32 @@ package com.example.mymeetings.viewmodels
 import android.annotation.SuppressLint
 import android.icu.util.Calendar
 import android.icu.util.TimeZone
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.example.mymeetings.data.Client
 import com.example.mymeetings.data.Manager
 import com.example.mymeetings.data.Meeting
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import java.text.SimpleDateFormat
 
 @SuppressLint("SimpleDateFormat")
 class MeetingDetailsViewModel(private val stateHandle: SavedStateHandle): ViewModel() {
-    val state = mutableStateOf<Meeting?>(null)
-    val personAreaInfo = mutableStateOf<Client>(Manager.emptyClient)
-    var selectedDate: Calendar = Calendar.getInstance(TimeZone.getDefault()).apply { timeInMillis = System.currentTimeMillis() }
-
-    private val _title = MutableStateFlow("")
-    val title: StateFlow<String> = _title
-
-    private val _date = MutableStateFlow("")
-    val date: StateFlow<String> = _date
-
-    private val _time = MutableStateFlow("")
-    val time: StateFlow<String> = _time
+    var isNewMeeting: Boolean = false
+    private val _currentState = MutableStateFlow<Meeting?>(null)
+    val currentState: StateFlow<Meeting?> = _currentState
 
     init {
         val id = stateHandle.get<Int>("meeting_id")
-        if (id == -1 || id == null) state.value = null
+        if (id == -1 || id == null) {
+            isNewMeeting = true
+            _currentState.value = Meeting(0, "", System.currentTimeMillis(), Manager.emptyClient)
+        }
         else {
-            state.value = Manager.getMeetingById(id)
-            personAreaInfo.value = state.value?.person ?: Manager.emptyClient
-
-            val titleInit  = state.value?.title ?: ""
-            selectedDate = Calendar.getInstance(TimeZone.getDefault()).apply { timeInMillis = state.value!!.dateTimeMs }
-
-            _title.value = titleInit
-
-            val simpleDateFormat = SimpleDateFormat("dd.MM.yyyy")
-            _date.value = simpleDateFormat.format(selectedDate.time).toString()
-
-            _time.value = "${selectedDate.get(Calendar.HOUR_OF_DAY)}:${selectedDate.get(Calendar.MINUTE)}"
-
+            isNewMeeting = false
+            _currentState.value = Manager.getMeetingById(id)
         }
     }
     fun onUpdateMeetingClick (titleNewValue: String, dateTimeMsNewValue: Long) {
-        val id = state.value?.id ?: -1
+        val id = _currentState.value?.id ?: -1
         if (id > -1) {
             Manager.updateMeeting(id, titleNewValue, dateTimeMsNewValue)
         }
@@ -60,22 +40,45 @@ class MeetingDetailsViewModel(private val stateHandle: SavedStateHandle): ViewMo
 
     // Is Add/Save button enabled?
     fun isButtonEnabled() : Boolean {
-        val isTitlePresent = (_title.value != "")
-        val isDatePresent = (_date.value != "")
-        val isTimePresent = (_time.value != "")
-        val isPersonPresent = (Manager.selectedClient.value != null || state.value != null)
-        return isTitlePresent && isDatePresent && isTimePresent && isPersonPresent
+        val isTitlePresent = (_currentState.value?.title != "")
+        val isPersonPresent = (Manager.selectedClient.value != null || !isNewMeeting)
+        return isTitlePresent && isPersonPresent
     }
 
-    fun updateTitle(newValue: String) {
-        _title.value = newValue
+    //////
+    // For date / time picker
+    //////
+    fun getInitialDateInMs(): Long {
+        if (isNewMeeting || _currentState.value == null) return System.currentTimeMillis()
+        else return _currentState.value!!.dateTimeMs
     }
 
-    fun updateDate(newValue: String) {
-        _date.value = newValue
+    fun getInitialHour(): Int {
+        if (isNewMeeting || _currentState.value == null) return 0
+        else {
+            val dateTimeCalendar = Calendar.getInstance(TimeZone.getDefault()).apply {
+                timeInMillis = _currentState.value!!.dateTimeMs
+            }
+            return dateTimeCalendar.get(Calendar.HOUR_OF_DAY)
+        }
     }
 
-    fun updateTime(newValue: String) {
-        _time.value = newValue
+    fun getInitialMinute(): Int {
+        if (isNewMeeting || _currentState.value == null) return 0
+        else {
+            val dateTimeCalendar = Calendar.getInstance(TimeZone.getDefault()).apply {
+                timeInMillis = _currentState.value!!.dateTimeMs
+            }
+            return dateTimeCalendar.get(Calendar.MINUTE)
+        }
+    }
+
+    fun setDateTimeInMs(datePickerValue: Long, timeHourPickerValue: Int, timeMinutePickerValue: Int) {
+        val selectedDateTimeCalendar = Calendar.getInstance(TimeZone.getDefault()).apply {
+            timeInMillis = datePickerValue
+        }
+        selectedDateTimeCalendar.set(Calendar.HOUR_OF_DAY, timeHourPickerValue)
+        selectedDateTimeCalendar.add(Calendar.MINUTE, timeMinutePickerValue)
+        _currentState.value?.dateTimeMs = selectedDateTimeCalendar.timeInMillis
     }
 }

@@ -3,7 +3,6 @@ package com.example.mymeetings.data
 import android.annotation.SuppressLint
 import android.icu.util.Calendar
 import android.icu.util.TimeZone
-import android.os.SystemClock
 import androidx.compose.runtime.mutableStateOf
 import com.example.mymeetings.MeetingApplication
 import com.example.mymeetings.dal.AppDatabase
@@ -13,15 +12,17 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
 
 object Manager {
     var selectedClient = mutableStateOf<Client?>(null)
     val emptyClient: Client = Client(Name("Empty ", "name"), "Empty email", Photo(""))
 
-    //var selectedDateTimeMs = mutableStateOf<Long>(System.currentTimeMillis())
-
     private var meetingDAO = AppDatabase.getDaoInstance(MeetingApplication.getAppContext())
 
+    //////
+    // For MeetingsListScreen
+    //////
     fun getMeetings(): List<Meeting> {
         return runBlocking(Dispatchers.IO){
             val meetingsFromDB = meetingDAO.getAll();
@@ -30,6 +31,9 @@ object Manager {
         }
     }
 
+    //////
+    // For notifications
+    //////
     fun getInOneHourMeetingsText(): String {
         return runBlocking(Dispatchers.IO) {
             val inOneHourMeetings = mutableListOf<Meeting>()
@@ -48,17 +52,9 @@ object Manager {
         }
     }
 
-    @SuppressLint("SimpleDateFormat")
-    fun getTimeString(dateTimeMs: Long): String {
-        val dateTimeCalendar = Calendar.getInstance(TimeZone.getDefault()).apply {
-            timeInMillis = dateTimeMs
-        }
-        val hourString = dateTimeCalendar.get(Calendar.HOUR_OF_DAY).toString()
-        val minuteString = dateTimeCalendar.get(Calendar.MINUTE).toString()
-
-        return "$hourString:$minuteString"
-    }
-
+    //////
+    // For converting in ROOM data-structure and back
+    //////
     private fun convertToMeeting(itemFromDB: MeetingRecord): Meeting {
         val newMeeting: Meeting = Meeting(
             id = itemFromDB.id,
@@ -86,6 +82,9 @@ object Manager {
         return newMeetingRecord
     }
 
+    //////
+    // For MeetingDetailsScreen
+    //////
     fun getMeetingById(id: Int): Meeting? {
         return runBlocking<Meeting?>(Dispatchers.IO){
             val meetingRecord = meetingDAO.getMeeting(id);
@@ -127,5 +126,27 @@ object Manager {
         }
 
         selectedClient.value = null
+    }
+
+    //////
+    // For time operations
+    //////
+    @SuppressLint("SimpleDateFormat")
+    fun getTimeString(dateTimeMs: Long): String {
+        val dateTimeCalendar = Calendar.getInstance(TimeZone.getDefault()).apply {
+            timeInMillis = dateTimeMs
+        }
+        val hourString = dateTimeCalendar.get(Calendar.HOUR_OF_DAY).toString()
+        val minuteString = dateTimeCalendar.get(Calendar.MINUTE).toString()
+
+        return "$hourString:$minuteString"
+    }
+
+    fun getDateString(dateTimeMs: Long): String {
+        val dateTimeCalendar = Calendar.getInstance(TimeZone.getDefault()).apply {
+            timeInMillis = dateTimeMs
+        }
+        val simpleDateFormat = SimpleDateFormat("dd.MM.yyyy")
+        return simpleDateFormat.format(dateTimeCalendar.time).toString()
     }
 }

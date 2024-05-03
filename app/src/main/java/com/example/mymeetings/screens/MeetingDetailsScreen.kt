@@ -1,8 +1,6 @@
 package com.example.mymeetings.screens
 
 import android.annotation.SuppressLint
-import android.icu.util.Calendar
-import android.icu.util.TimeZone
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -27,7 +25,6 @@ import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -46,7 +43,6 @@ import com.example.mymeetings.viewmodels.MeetingDetailsViewModel
 import com.example.mymeetings.R
 import com.example.mymeetings.data.Manager
 import com.example.mymeetings.data.PresentOrFutureSelectableDates
-import java.text.SimpleDateFormat
 
 @SuppressLint("SimpleDateFormat")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,25 +50,21 @@ import java.text.SimpleDateFormat
 fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, modifier: Modifier = Modifier) {
 
     val meetingVM: MeetingDetailsViewModel = viewModel()
-    val item = meetingVM.state.value
-    val personInit = meetingVM.personAreaInfo.value
+    val meetingState by meetingVM.currentState.collectAsState()
 
-    val meetingTitle by meetingVM.title.collectAsState()
-    val meetingDate by meetingVM.date.collectAsState()
-    val meetingTime by meetingVM.time.collectAsState()
-
-    val selectedDateTimeMsInit : Long = (item?.dateTimeMs) ?: System.currentTimeMillis()
-    val selectedDateTimeMs = remember { mutableLongStateOf(selectedDateTimeMsInit) }
+    val titleFieldText = remember { mutableStateOf(meetingState!!.title) }
+    val dateFieldText = remember { mutableStateOf(Manager.getDateString(meetingState!!.dateTimeMs)) }
+    val timeFieldText = remember { mutableStateOf(Manager.getTimeString(meetingState!!.dateTimeMs)) }
 
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = selectedDateTimeMs.value,
+        initialSelectedDateMillis = meetingVM.getInitialDateInMs(),
         selectableDates = PresentOrFutureSelectableDates
     )
     val showDatePicker = remember { mutableStateOf(false) }
 
     val timePickerState = rememberTimePickerState(
-        initialHour = meetingVM.selectedDate.get(Calendar.HOUR_OF_DAY),
-        initialMinute = meetingVM.selectedDate.get(Calendar.MINUTE),
+        initialHour = meetingVM.getInitialHour(),
+        initialMinute = meetingVM.getInitialMinute(),
         is24Hour = true
     )
     val showTimePicker = remember { mutableStateOf(false) }
@@ -85,14 +77,16 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
         horizontalAlignment = Alignment.Start,
     ) {
         Text(
-            text = if (item != null) stringResource(id = R.string.meetingdetails_header)
+            text = if (!meetingVM.isNewMeeting) stringResource(id = R.string.meetingdetails_header)
             else stringResource(id = R.string.meetingdetails_newitem_header),
             fontSize = 25.sp
         )
         Column(modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
             TextField(
-                value = meetingTitle,
-                onValueChange = { newText -> meetingVM.updateTitle(newText)},
+                value = titleFieldText.value,
+                onValueChange = {
+                    titleFieldText.value = it
+                    meetingState!!.title = it },
                 label = { Text(stringResource(id = R.string.meetingdetails_title_lable)) },
                 singleLine = true,
                 modifier = modifier
@@ -101,7 +95,7 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
             )
             Row(modifier = modifier.padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                 TextField(
-                    value = meetingDate,
+                    value = dateFieldText.value,
                     onValueChange = { },
                     label = { Text(stringResource(id = R.string.meetingdetails_date_lable)) },
                     singleLine = true,
@@ -118,7 +112,7 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
             }
             Row(modifier = modifier.padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                 TextField(
-                    value = meetingTime,
+                    value = timeFieldText.value,
                     onValueChange = { },
                     label = { Text(stringResource(id = R.string.meetingdetails_time_lable)) },
                     singleLine = true,
@@ -133,17 +127,17 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
                     Text(text = "Select a time")
                 }
             }
-            PersonCard(personInit = personInit, onNavigateToClients = onNavigateToClients, modifier = modifier)
+            PersonCard(personInit = meetingState!!.person, onNavigateToClients = onNavigateToClients, modifier = modifier)
             Button(modifier = modifier
                 .padding(top = 8.dp)
                 .fillMaxWidth(),
                 enabled = meetingVM.isButtonEnabled(),
                 onClick = {
-                    if (item != null) meetingVM.onUpdateMeetingClick(meetingTitle, selectedDateTimeMs.value)
-                    else meetingVM.onAddMeetingClick(meetingTitle, selectedDateTimeMs.value)
+                    if (!meetingVM.isNewMeeting) meetingVM.onUpdateMeetingClick(meetingState!!.title, meetingState!!.dateTimeMs)
+                    else meetingVM.onAddMeetingClick(meetingState!!.title, meetingState!!.dateTimeMs)
                     onReturn()
                 }) {
-                Text(text = if (item != null) stringResource(id = R.string.meetingdetails_save_button)
+                Text(text = if (!meetingVM.isNewMeeting) stringResource(id = R.string.meetingdetails_save_button)
                 else stringResource(id = R.string.meetingdetails_add_button))
             }
             Button(modifier = modifier
@@ -164,23 +158,11 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
             confirmButton = {
                 TextButton(
                     onClick = {
-                        // Get selected date (from picker) and convert it to formatted string (to display in Text field)
-                        val selectedDate = Calendar.getInstance(TimeZone.getDefault()).apply {
-                            timeInMillis = datePickerState.selectedDateMillis!!
-                        }
-                        val simpleDateFormat = SimpleDateFormat("dd.MM.yyyy")
-                        val dateText = simpleDateFormat.format(selectedDate.time).toString()
-                        meetingVM.updateDate(dateText)
+                        // update date&time in VM
+                        meetingVM.setDateTimeInMs(datePickerState.selectedDateMillis!!, timePickerState.hour, timePickerState.minute)
 
-                        // Get selected date (from date picker), add selected time (from time picker) and save as selectedDateTime in Screen
-                        val selectedDateTimeCalendar = Calendar.getInstance(TimeZone.getDefault()).apply {
-                            timeInMillis = datePickerState.selectedDateMillis!!
-                        }
-                        selectedDateTimeCalendar.add(Calendar.HOUR_OF_DAY, timePickerState.hour)
-                        selectedDateTimeCalendar.add(Calendar.HOUR_OF_DAY, -10)
-                        selectedDateTimeCalendar.add(Calendar.MINUTE, timePickerState.minute)
-                        selectedDateTimeMs.value = selectedDateTimeCalendar.timeInMillis
-
+                        // update date in dateField
+                        dateFieldText.value = Manager.getDateString(meetingState!!.dateTimeMs)
 
                         showDatePicker.value = false
                     }
@@ -202,18 +184,11 @@ fun MeetingDetailsScreen(onNavigateToClients: () -> Unit, onReturn: () -> Unit, 
             confirmButton = {
                 TextButton(
                     onClick = {
-                        // Get selected date (from date picker), add selected time (from time picker) and save as selectedDateTime in Screen // TimeZone.getDefault()
-                        val selectedDateTimeCalendar = Calendar.getInstance(TimeZone.getDefault()).apply {
-                            timeInMillis = datePickerState.selectedDateMillis!!
-                        }
-                        selectedDateTimeCalendar.add(Calendar.HOUR_OF_DAY, timePickerState.hour)
-                        selectedDateTimeCalendar.add(Calendar.HOUR_OF_DAY, -10)
-                        selectedDateTimeCalendar.add(Calendar.MINUTE, timePickerState.minute)
-                        selectedDateTimeMs.value = selectedDateTimeCalendar.timeInMillis
+                        // update date&time in VM
+                        meetingVM.setDateTimeInMs(datePickerState.selectedDateMillis!!, timePickerState.hour, timePickerState.minute)
 
-                        // Get selected time (from picker) and convert it to formatted string (to display in Text field)
-                        val selectedTimeValue: String = "${timePickerState.hour}:${timePickerState.minute}"
-                        meetingVM.updateTime(selectedTimeValue)
+                        // update date in dateField
+                        timeFieldText.value = Manager.getTimeString(meetingState!!.dateTimeMs)
 
                         showTimePicker.value = false
                     }
