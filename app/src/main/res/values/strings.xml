@@ -13,6 +13,9 @@
     <string name="meetingdetails_save_button">Save changes</string>
     <string name="meetingdetails_add_button">Add new meeting</string>
     <string name="meetingdetails_cancel_button">Cancel</string>
+    <string name="meetingdetails_ok_button">Ok</string>
+    <string name="meetingdetails_select_date_button">Select date</string>
+    <string name="meetingdetails_select_time_button">Select time</string>
 
     <string name="clientslist_header">Clients List</string>
     <string name="clientslist_back_button">Back</string>

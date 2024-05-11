@@ -44,8 +44,7 @@ fun MeetingsListScreen(modifier: Modifier = Modifier, onItemClick: (id: Int) -> 
 
     Column(
         modifier = modifier
-            .padding(8.dp)
-            .fillMaxSize(),
+            .padding(8.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start,
     ) {
@@ -53,17 +52,17 @@ fun MeetingsListScreen(modifier: Modifier = Modifier, onItemClick: (id: Int) -> 
             text = stringResource(id = R.string.meetingslist_header),
             fontSize=25.sp
         )
-        LazyColumn (modifier = modifier
+        LazyColumn (modifier = Modifier
             .padding(horizontal = 16.dp)
             .fillMaxWidth()
-            .height(650.dp)
+            .weight(1f)
         ) {
             items(meetingsVM.getMeetings()) { meeting ->
                 dateTimeString = meetingsVM.getDateTimeString(meeting.dateTimeMs)
-                MeetingItem(meeting, dateTimeString, modifier, onItemClick = { id -> onItemClick(id) })
+                MeetingItem(meeting, dateTimeString, onItemClick = { id -> onItemClick(id) })
             }
         }
-        FloatingActionButton(modifier = modifier
+        FloatingActionButton(modifier = Modifier
             .padding(horizontal = 16.dp)
             .align(Alignment.End),
             onClick = { onItemClick(-1) } ) {
@@ -73,14 +72,14 @@ fun MeetingsListScreen(modifier: Modifier = Modifier, onItemClick: (id: Int) -> 
 }
 
 @Composable
-fun MeetingItem(item: Meeting, dateTimeString: String, modifier: Modifier, onItemClick: (id: Int) -> Unit) {
-    Card (modifier = modifier
+fun MeetingItem(item: Meeting, dateTimeString: String, onItemClick: (id: Int) -> Unit) {
+    Card (modifier = Modifier
         .padding(vertical = 4.dp)
         .fillMaxWidth()
         .clickable { onItemClick(item.id) }
     ) {
-        Row(modifier = modifier.padding(8.dp)) {
-            Box(modifier = modifier
+        Row(modifier = Modifier.padding(8.dp)) {
+            Box(modifier = Modifier
                 .size(60.dp)
                 .background(Color.Green)
             ) {
@@ -101,7 +100,7 @@ fun MeetingItem(item: Meeting, dateTimeString: String, modifier: Modifier, onIte
                     )
                 }
             }
-            Column (modifier = modifier.padding(start = 8.dp)) {
+            Column (modifier = Modifier.padding(start = 8.dp)) {
                 Text(item.title)
                 Text(dateTimeString)
                 Text("${item.person.name.first} ${item.person.name.last}")

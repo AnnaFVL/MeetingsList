@@ -39,8 +39,7 @@ fun ClientsListScreen(onReturn: () -> Unit, modifier: Modifier = Modifier) {
 
     Column(
         modifier = modifier
-            .padding(8.dp)
-            .fillMaxSize(),
+            .padding(8.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start,
     ) {
@@ -48,19 +47,19 @@ fun ClientsListScreen(onReturn: () -> Unit, modifier: Modifier = Modifier) {
             text = stringResource(id = R.string.clientslist_header),
             fontSize = 25.sp
         )
-        LazyColumn(modifier = modifier
+        LazyColumn(modifier = Modifier
             .padding(horizontal = 16.dp)
             .fillMaxWidth()
-            .height(650.dp)
+            .weight(1f)
         ) {
             items(viewModel.state.value) { client ->
-                ClientItem(client, modifier, onItemClick = {
+                ClientItem(client, onItemClick = {
                     viewModel.selectClient(client)
                     onReturn()
                 })
             }
         }
-        Button(modifier = modifier
+        Button(modifier = Modifier
             .padding(top = 8.dp)
             .fillMaxWidth(),
             onClick = {
@@ -72,15 +71,15 @@ fun ClientsListScreen(onReturn: () -> Unit, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ClientItem(item: Client, modifier: Modifier = Modifier, onItemClick: (selected: Client) -> Unit){
-    Card (modifier = modifier
+fun ClientItem(item: Client, onItemClick: (selected: Client) -> Unit){
+    Card (modifier = Modifier
         .padding(vertical = 4.dp)
         .fillMaxWidth()
         .clickable { onItemClick(item) }
     ) {
-        Row(modifier = modifier.padding(8.dp)) {
+        Row(modifier = Modifier.padding(8.dp)) {
             Box(
-                modifier = modifier
+                modifier = Modifier
                     .size(60.dp)
                     .background(Color.Green)
             ) {
@@ -93,7 +92,7 @@ fun ClientItem(item: Client, modifier: Modifier = Modifier, onItemClick: (select
                     modifier = Modifier.size(60.dp)
                 )
             }
-            Column(modifier = modifier.padding(start = 8.dp)) {
+            Column(modifier = Modifier.padding(start = 8.dp)) {
                 Text(text = "${item.name.first} ${item.name.last}")
                 Text(text = item.email)
             }
